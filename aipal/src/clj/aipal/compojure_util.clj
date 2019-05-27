@@ -1,8 +1,6 @@
 (ns aipal.compojure-util
   (:require compojure.api.meta
-            [arvo.auth.user-rights :refer [authorize]]
-            [oph.compojure-util :as cu]
-            [korma.db :as db]))
+            [arvo.auth.user-rights :refer [authorize]]))
 
 (defmacro autorisoitu-transaktio
   "Tarkastaa käyttöoikeudet ja hallitsee tietokanta-transaktion"
