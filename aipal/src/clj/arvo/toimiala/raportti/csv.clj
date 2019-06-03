@@ -28,7 +28,9 @@
                                 :toimipaikka_selite "Toimipaikan nimi"
                                 :koulutusalakoodi_selite "Koulutusala"
                                 :asuinkunta_koodi_selite "Asuinkunta selite"
-                                :opiskelupaikkakunta_koodi_selite "Opiskelupaikkakunta selite"}
+                                :opiskelupaikkakunta_koodi_selite "Opiskelupaikkakunta selite"
+                                :oppilaitos_nimi "Oppilaitos"
+                                :koulutusmuoto "Koulutusmuoto"}
                            :sv {:vastaajatunnus "Svarskod"
                                 :vastausaika "Svarstid"
                                 :tunnus "Svarskod"
@@ -42,7 +44,9 @@
                                 :toimipaikka_selite "Namn på verksamhetsställe"
                                 :koulutusalakoodi_selite "Utbildningsområde"
                                 :asuinkunta_koodi_selite "Bostadskommun"
-                                :opiskelupaikkakunta_koodi_selite "Field of education"}
+                                :opiskelupaikkakunta_koodi_selite "Field of education"
+                                :oppilaitos_nimi "Läroanstalt"
+                                :koulutusmuoto "Utbildningsform"}
                            :en {:vastaajatunnus "Answer identifier" :vastausaika "Response time"
                                 :tunnus "Answer identifier"
                                 :luotuaika "TimeCreated"
@@ -55,7 +59,9 @@
                                 :toimipaikka_selite "Name of operational unit"
                                 :koulutusalakoodi_selite "Field of education"
                                 :asuinkunta_koodi_selite "Municipality of residence"
-                                :opiskelupaikkakunta_koodi_selite "Municipality of education"}})
+                                :opiskelupaikkakunta_koodi_selite "Municipality of education"
+                                :oppilaitos_nimi "Educational institution"
+                                :koulutusmuoto "Form of education"}})
 
 (def delimiter \;)
 
@@ -178,7 +184,12 @@
      :date (f/unparse (f/formatters :date) (time/now))
      :csv data}))
 
-(def default-csv-fields [:vastaajatunnus :vastausaika])
+(defn default-csv-fields [kyselyid]
+  (let [kyselytyyppi (:tyyppi (db/hae-kysely {:kyselyid kyselyid}))]
+    (if (= 5 kyselytyyppi)
+      [:vastaajatunnus :vastausaika :oppilaitos_nimi]
+      [:vastaajatunnus :vastausaika])))
+
 (def default-vastaajatunnus-fields [:tunnus :url :luotuaika :voimassa_alkupvm :voimassa_loppupvm :vastausten_lkm :vastaajien_lkm])
 
 (defn get-csv-field [kentta]
@@ -193,8 +204,8 @@
        (map get-csv-field)
        flatten))
 
-(defn get-csv-fields [taustatiedot]
-  (concat default-csv-fields (taustatieto-kentat taustatiedot)))
+(defn get-csv-fields [kyselyid taustatiedot]
+  (concat (default-csv-fields kyselyid) (taustatieto-kentat taustatiedot)))
 
 (defn luo-käännökset [taustatiedot lang]
   (into (lang default-translations)
@@ -232,6 +243,7 @@
 (defn format-vastaus [vastaus selitteet lang]
   (-> (merge (:taustatiedot vastaus) vastaus)
       (update :vastausaika format-date)
+      (assoc :oppilaitos_nimi (translate-field "oppilaitos_nimi" lang vastaus))
       (lisaa-selitteet selitteet lang)))
 
 (defn luo-vastausrivi [template lang taustatieto-fields choices selitteet answers]
@@ -279,7 +291,7 @@
 
 (defn kysely-csv [kyselyid lang]
   (let [taustatiedot (db/kyselyn-kentat {:kyselyid kyselyid})
-        taustatieto-fields (get-csv-fields taustatiedot)
+        taustatieto-fields (get-csv-fields kyselyid taustatiedot)
         kysymykset (hae-kysymykset kyselyid)
         translations (luo-käännökset taustatiedot lang)
         vastaukset (filter-not-allowed kysymykset (group-by :vastaajaid (db/hae-vastaukset {:kyselyid kyselyid})))
@@ -296,7 +308,7 @@
 
 (defn kysely-csv-vastauksittain [kyselyid lang]
   (let [taustatiedot (db/kyselyn-kentat {:kyselyid kyselyid})
-        taustatieto-fields (get-csv-fields taustatiedot)
+        taustatieto-fields (get-csv-fields kyselyid taustatiedot)
         kysymykset (hae-kysymykset kyselyid)
         selitteet (hae-selitteet kyselyid)
         translations (luo-käännökset taustatiedot lang)
