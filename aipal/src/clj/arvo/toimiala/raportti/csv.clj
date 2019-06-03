@@ -86,7 +86,7 @@
   (filter second (select-keys q [:kysymysid])))
 
 (defn create-row-template [questions]
-    (mapcat get-template-parts questions))
+  (mapcat get-template-parts questions))
 
 (defn get-question-group-text [questions entry]
   (let [question (some #(if (= (get % (first entry)) (second entry))%) questions)]
@@ -237,7 +237,7 @@
                (first (filter #(= (:asuinkunta_koodi data) (:kuntakoodi %)) (:kunnat selitteet)))))
       (assoc :opiskelupaikkakunta_koodi_selite
              (translate-field "nimi" lang
-                              (first (filter #(= (:opiskelupaikkakunta_koodi data) (:kuntakoodi %)) (:kunnat selitteet)))))))
+               (first (filter #(= (:opiskelupaikkakunta_koodi data) (:kuntakoodi %)) (:kunnat selitteet)))))))
 
 
 (defn format-vastaus [vastaus selitteet lang]
