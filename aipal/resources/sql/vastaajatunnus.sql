@@ -45,7 +45,7 @@ ORDER BY vt.luotuaika DESC;
 -- :name hae-vastaajatunnus :? :*
 SELECT vt.vastaajatunnusid, vt.kyselykertaid, vt.tutkintotunnus, vt.tunnus, vt.lukittu, vt.luotu_kayttaja, vt.muutettu_kayttaja,
        vt.luotuaika, vt.muutettuaika, vt.valmistavan_koulutuksen_jarjestaja, vt.valmistavan_koulutuksen_oppilaitos,
-       vt.suorituskieli, vt.kunta, vt.taustatiedot, vt.voimassa_alkupvm, vt.voimassa_loppupvm, vt.kaytettavissa,
+       vt.suorituskieli, vt.kunta, vt.taustatiedot, vt.voimassa_alkupvm, vt.voimassa_loppupvm, vt.vastaajien_lkm, vt.kaytettavissa,
 -- query vt.*, merge with taustatiedot??
 -- drop old columns, check migration to jsonb
 t.nimi_fi, t.nimi_sv, t.nimi_en, kaytettavissa(vt) AS kaytettavissa, (vt.taustatiedot ->> 'koulutusmuoto') AS koulutusmuoto,

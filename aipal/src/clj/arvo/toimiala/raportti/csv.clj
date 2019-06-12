@@ -10,7 +10,8 @@
             [clj-time.format :as f]
             [aipal.asetukset :refer [asetukset]]
             [arvo.util :refer [in?]]
-            [aipal.integraatio.koodistopalvelu :refer [hae-kunnat]]))
+            [aipal.integraatio.koodistopalvelu :refer [hae-kunnat]]
+            [clojure.tools.logging :as log]))
 
 (def default-translations {:fi {:vastaajatunnus "Vastaajatunnus"
                                 :vastausaika "Vastausaika"
@@ -184,11 +185,10 @@
      :date (f/unparse (f/formatters :date) (time/now))
      :csv data}))
 
-(defn default-csv-fields [kyselyid]
-  (let [kyselytyyppi (:tyyppi (db/hae-kysely {:kyselyid kyselyid}))]
-    (if (= 5 kyselytyyppi)
-      [:vastaajatunnus :vastausaika :oppilaitos_nimi]
-      [:vastaajatunnus :vastausaika])))
+(defn default-csv-fields [kyselytyyppi]
+  (if (= 5 kyselytyyppi)
+    [:vastaajatunnus :vastausaika :oppilaitos_nimi]
+    [:vastaajatunnus :vastausaika]))
 
 (def default-vastaajatunnus-fields [:tunnus :url :luotuaika :voimassa_alkupvm :voimassa_loppupvm :vastausten_lkm :vastaajien_lkm])
 
@@ -204,8 +204,8 @@
        (map get-csv-field)
        flatten))
 
-(defn get-csv-fields [kyselyid taustatiedot]
-  (concat (default-csv-fields kyselyid) (taustatieto-kentat taustatiedot)))
+(defn get-csv-fields [kyselytyyppi taustatiedot]
+  (concat (default-csv-fields kyselytyyppi) (taustatieto-kentat taustatiedot)))
 
 (defn luo-käännökset [taustatiedot lang]
   (into (lang default-translations)
@@ -283,18 +283,20 @@
 (defn luovutuslupa [[vastaajaid vastaukset] kysymysid]
   (= 0 (:numerovalinta (first (filter #(= kysymysid (:kysymysid %)) vastaukset)))))
 
-(defn filter-not-allowed [kysymykset vastaukset]
+(defn filter-not-allowed [kyselytyyppi kysymykset vastaukset]
   (let [lupakysymys (:kysymysid (first (filter #(= "tietojen_luovutus" (-> % :kategoria :taustakysymyksen_tyyppi)) kysymykset)))]
-    (if lupakysymys
+    (if (and lupakysymys (some #{1 6} #{kyselytyyppi}))
       (filter #(luovutuslupa % lupakysymys) vastaukset)
       vastaukset)))
 
 (defn kysely-csv [kyselyid lang]
-  (let [taustatiedot (db/kyselyn-kentat {:kyselyid kyselyid})
-        taustatieto-fields (get-csv-fields kyselyid taustatiedot)
+  (let [kyselytyyppi (:tyyppi (db/hae-kysely {:kyselyid kyselyid}))
+        taustatiedot (db/kyselyn-kentat {:kyselyid kyselyid})
+        taustatieto-fields (get-csv-fields kyselytyyppi taustatiedot)
         kysymykset (hae-kysymykset kyselyid)
         translations (luo-käännökset taustatiedot lang)
-        vastaukset (filter-not-allowed kysymykset (group-by :vastaajaid (db/hae-vastaukset {:kyselyid kyselyid})))
+        vastaukset (filter-not-allowed kyselytyyppi kysymykset
+                                       (group-by :vastaajaid (db/hae-vastaukset {:kyselyid kyselyid})))
         monivalintavaihtoehdot (hae-monivalinnat kysymykset)
         selitteet (hae-selitteet kyselyid)
         template (create-row-template kysymykset)
@@ -307,12 +309,13 @@
     (csv-response kyselyid lang (create-csv (cons header vastausrivit)))))
 
 (defn kysely-csv-vastauksittain [kyselyid lang]
-  (let [taustatiedot (db/kyselyn-kentat {:kyselyid kyselyid})
-        taustatieto-fields (get-csv-fields kyselyid taustatiedot)
+  (let [kyselytyyppi (:tyyppi (db/hae-kysely {:kyselyid kyselyid}))
+        taustatiedot (db/kyselyn-kentat {:kyselyid kyselyid})
+        taustatieto-fields (get-csv-fields kyselytyyppi taustatiedot)
         kysymykset (hae-kysymykset kyselyid)
         selitteet (hae-selitteet kyselyid)
         translations (luo-käännökset taustatiedot lang)
-        vastaukset (filter-not-allowed kysymykset (group-by :vastaajaid (db/hae-vastaukset {:kyselyid kyselyid})))
+        vastaukset (filter-not-allowed kyselytyyppi kysymykset (group-by :vastaajaid (db/hae-vastaukset {:kyselyid kyselyid})))
         monivalintavaihtoehdot (hae-monivalinnat kysymykset)
         taustakysymykset (->> kysymykset
                               (filter :taustakysymys)
