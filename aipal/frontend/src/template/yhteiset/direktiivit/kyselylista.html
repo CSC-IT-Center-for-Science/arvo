@@ -31,12 +31,12 @@
           </button>
         </auth>
         <auth roolit="['OPL-VASTUUKAYTTAJA']" ng-if="kysely.poistettavissa">
-          <button class="btn btn-primary pull-left e2e-poista-kysely" ng-click="poistaKyselyModal(kyselyt, kysely)">
+          <button class="btn btn-primary pull-left e2e-poista-kysely" ng-click="poistaKyselyModal(kyselyt, kysely)" ng-if="!kysely.automatisoitu">
             {{ 'kysely.poista' | i18n }}&nbsp;
             <span class="fa fa-trash"></span>
           </button>
         </auth>
-        <auth roolit="['OPL-VASTUUKAYTTAJA', 'OPL-KYSELYKERTAKAYTTAJA']" ng-if="kysely.tila === 'julkaistu' && kysely.kaytettavissa">
+        <auth roolit="['OPL-VASTUUKAYTTAJA', 'OPL-KYSELYKERTAKAYTTAJA']" ng-if="kysely.tila === 'julkaistu' && kysely.kaytettavissa && !kysely.automatisoitu">
           <button class="btn btn-primary pull-left e2e-uusi-kyselykerta" ng-click="uusiKyselykerta(kysely)">
             {{ 'kyselykerta.uusi_kyselykerta' | i18n }}&nbsp;
             <span class="fa fa-plus"></span>

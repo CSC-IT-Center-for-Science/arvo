@@ -29,20 +29,20 @@
                                                     (sql/where {:kysely_kysymysryhma.kyselyid kyselyid})))))
 
 
-(defn rajaa-kayttajalle-sallittuihin-kyselyihin [query kyselyid koulutustoimija]
-  (let [koulutustoimijan-oma {:kysely_organisaatio_view.koulutustoimija koulutustoimija}
-        ntm-kysely           (kysely-sisaltaa-ntm-kysymysryhman kyselyid)
-        tyhja-kysely         (kysely-on-tyhja kyselyid)]
-    (cond
-      (yllapitaja?)         (-> query
-                              (sql/where koulutustoimijan-oma))
-      (ntm-vastuukayttaja?) (-> query
-                              (sql/where (and koulutustoimijan-oma
-                                              (or tyhja-kysely
-                                               ntm-kysely))))
-      :else                 (-> query
-                              (sql/where (and koulutustoimijan-oma
-                                              (not ntm-kysely)))))))
+;(defn rajaa-kayttajalle-sallittuihin-kyselyihin [query kyselyid koulutustoimija]
+;  (let [koulutustoimijan-oma {:kysely_organisaatio_view.koulutustoimija koulutustoimija}
+;        ntm-kysely           (kysely-sisaltaa-ntm-kysymysryhman kyselyid)
+;        tyhja-kysely         (kysely-on-tyhja kyselyid)]
+;    (cond
+;      (yllapitaja?)         (-> query
+;                              (sql/where koulutustoimijan-oma))
+;      (ntm-vastuukayttaja?) (-> query
+;                              (sql/where (and koulutustoimijan-oma
+;                                              (or tyhja-kysely
+;                                               ntm-kysely))))
+;      :else                 (-> query
+;                              (sql/where (and koulutustoimijan-oma
+;                                              (not ntm-kysely)))))))
 
 (defn rajaa-kayttajalle-sallittuihin-kyselyihin-sql []
   (let [koulutustoimijan-oma "(kysely_organisaatio_view.koulutustoimija = ?)"

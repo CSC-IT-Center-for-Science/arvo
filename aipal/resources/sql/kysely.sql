@@ -21,7 +21,32 @@ WHERE kysymysid IN (:v*:kysymysidt);
 SELECT * FROM kyselytyyppi;
 
 -- :name hae-kysely :? :1
-SELECT * FROM kysely WHERE kyselyid = :kyselyid;
+SELECT *, k.kaytettavissa,
+       NOT EXISTS(SELECT 1
+                  FROM kyselykerta kk
+                           JOIN vastaajatunnus vt ON kk.kyselykertaid = vt.kyselykertaid
+                           JOIN vastaaja v on kk.kyselykertaid = vt.kyselykertaid
+                  WHERE kk.kyselyid = k.kyselyid AND k.tila IN ('luonnos', 'suljettu')) AS poistettavissa,
+       EXISTS (SELECT 1 FROM amispalaute_automatisointi a WHERE a.voimassa_alkaen < now() AND a.koulutustoimija = k.koulutustoimija) AS automatisoitu
+       FROM kysely k WHERE kyselyid = :kyselyid;
+
+-- :name hae-kyselyt :? :*
+SELECT k.kyselyid, k.nimi_fi, k.nimi_sv, k.nimi_en, k.voimassa_alkupvm, k.voimassa_loppupvm,
+       k.tila, k.kaytettavissa, k.uudelleenohjaus_url, k.sivutettu, k.koulutustoimija,
+       NOT EXISTS(SELECT 1
+                  FROM kyselykerta kk
+                           JOIN vastaajatunnus vt ON kk.kyselykertaid = vt.kyselykertaid
+                           JOIN vastaaja v on kk.kyselykertaid = vt.kyselykertaid
+                  WHERE kk.kyselyid = k.kyselyid AND k.tila IN ('luonnos', 'suljettu')) AS poistettavissa,
+       (SELECT COUNT(*) FROM kysely_kysymysryhma kkr WHERE kkr.kyselyid = k.kyselyid) AS kysymysryhmien_lkm,
+       (SELECT now() < k.voimassa_alkupvm) AS tulevaisuudessa,
+       (SELECT CASE WHEN k.tila = 'luonnos' THEN 'luonnos'
+                    WHEN k.kaytettavissa OR now() < k.voimassa_alkupvm THEN 'julkaistu'
+                    ELSE 'suljettu' END) AS sijainti,
+       EXISTS(SELECT 1 FROM amispalaute_automatisointi a WHERE a.voimassa_alkaen < now() AND a.koulutustoimija = k.koulutustoimija) AS automatisoitu
+FROM kysely k
+WHERE k.koulutustoimija = :koulutustoimija
+ORDER BY k.kyselyid;
 
 -- :name hae-kyselykerran-kysely :? :1
 SELECT k.* FROM kyselykerta kk
