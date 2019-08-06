@@ -21,7 +21,7 @@
             [arvo.db.core :refer [*db*] :as db]
             [clj-time.coerce :as c]))
 
-(def kyselytyyppi-tutkintotyypit {"palautekysely" ["06" "07" "12"]
+(def kyselytyyppi-tutkintotyypit {"avop" ["06" "07" "12"]
                                   "yo-uraseuranta" ["06" "07" "12" "13" "14" "15" "16"]
                                   "kandipalaute" ["13" "14" "15" "16"]})
 
