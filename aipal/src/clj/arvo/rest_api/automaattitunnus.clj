@@ -22,8 +22,6 @@
             [aipal.arkisto.koulutustoimija :as koulutustoimija]
             [aipal.arkisto.kyselykerta :as kyselykerta]
             [clojure.tools.logging :as log]
-            ;[buddy.auth.backends.token :refer (jws-backend)]
-            ;[buddy.auth.middleware :refer (wrap-authentication)]
             [buddy.auth :refer [authenticated? throw-unauthorized]]
             [clj-time.core :as time]
             [oph.common.util.http-util :refer [parse-iso-date]]
@@ -137,10 +135,8 @@
   {:error error})
 
 (defn lisaa-amispalaute-automatisointi! [tunnus]
-  (try
-    (db/lisaa-automatisointiin! {:koulutustoimija (:valmistavan_koulutuksen_jarjestaja tunnus)
-                                 :lahde "EHOKS"})
-    (catch Exception e (log/error "AUTO EX" ()))))
+  (db/lisaa-automatisointiin! {:koulutustoimija (:valmistavan_koulutuksen_jarjestaja tunnus)
+                               :lahde "EHOKS"}))
 
 (defn lisaa-automaattitunnus! [tunnus]
   (let [luotu-tunnus (vastaajatunnus/lisaa-automaattitunnus! tunnus)]
@@ -173,7 +169,7 @@
         (on-validation-error (format "Unexpected error: %s" (.getMessage e2)))))))
 
 (defroutes ehoks-v1
-  (POST "/" [:as request]
+  (POST "/" []
     :body [data Amispalaute-tunnus]
     :return s/Any
     :summary "Kyselylinkin luominen"
@@ -181,4 +177,17 @@
         on opintopolun koulutus koodiston 6 numeroinen koodi.")
     (let [tunnus (amispalaute-tunnus data)]
       (lisaa-amispalaute-automatisointi! tunnus)
-      (lisaa-automaattitunnus! tunnus))))
+      (log/info "Luodaan automaattitunnus, request-id:" (:request-id data))
+      (lisaa-automaattitunnus! tunnus)))
+  (GET "/status/:tunnus" []
+    :path-params [tunnus :- s/Str]
+    (let [status (db/vastaajatunnus-status {:tunnus tunnus})]
+      (api-response (dissoc status :vastaajatunnusid))))
+  (DELETE "/:tunnus" []
+    :path-params [tunnus :- s/Str]
+    (let [status (db/vastaajatunnus-status {:tunnus tunnus})]
+      (if-not (:vastattu status)
+        (do (db/poista-vastaajatunnus! {:vastaajatunnusid status})
+            (api-response "Tunnus poistettu"))
+        {:status 404 :body "Tunnuksella on jo vastauksia"}))))
+
