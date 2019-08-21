@@ -1,5 +1,5 @@
 
--- :name kyselytyypin_kentat :? :*
+-- :name kyselytyypin-kentat :? :*
 SELECT * FROM kyselytyyppi_kentat WHERE kyselytyyppi = :kyselytyyppi;
 
 -- :name kyselykerran-tyyppi :? :1
