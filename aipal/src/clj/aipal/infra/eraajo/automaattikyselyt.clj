@@ -15,22 +15,22 @@
 
 (defn luo-kyselyt! [kuvaus tx]
   (let [koulutustoimijat (db/hae-automaattikysely-koulutustoimijat tx kuvaus)
-        _ (log/info "Luodaan automaattikyselyt" (count koulutustoimijat) "koulutustoimijalle")]
-    (doall (for [k koulutustoimijat]
-             (luo-kysely! k kuvaus tx)))))
+        _ (log/info "Luodaan automaattikyselyt ("(:tunniste kuvaus)")" (count koulutustoimijat) "koulutustoimijalle")]
+    (doseq[k koulutustoimijat]
+      (luo-kysely! k kuvaus tx))))
 
-(defn luo-automaattikyselyt []
-  (let [kuvaukset (db/hae-automaattikysely-data)
-        kyselyidt (jdbc/with-db-transaction [tx *db*]
-                    (flatten (doall (for [kuvaus kuvaukset]
-                                      (luo-kyselyt! kuvaus tx)))))]
-    (log/info "Luotu" (count kyselyidt) "automaattikyselyä: " kyselyidt)))
+(defn luo-automaattikyselyt! []
+  (let [kuvaukset (db/hae-automaattikysely-data)]
+    (jdbc/with-db-transaction [tx *db*]
+      (doseq [kuvaus kuvaukset]
+        (luo-kyselyt! kuvaus tx)))))
 
 (defrecord LuoAutomaattikyselytJob []
   Job
   (execute [this ctx]
     (try
-      (luo-automaattikyselyt)
+      (do (luo-automaattikyselyt!)
+          (log/info "Automaattikyselyiden luonti valmis"))
       (catch Exception e
-        (log/error "Automaattikyselyiden luonti epäonnistui"
-            (map str (.getStackTrace e)))))))
+        (log/error "Automaattikyselyiden luonti epäonnistui")
+        (.printStackTrace e)))))
