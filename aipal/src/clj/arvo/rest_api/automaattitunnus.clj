@@ -187,7 +187,7 @@
     :path-params [tunnus :- s/Str]
     (let [status (db/vastaajatunnus-status {:tunnus tunnus})]
       (if-not (:vastattu status)
-        (do (db/poista-vastaajatunnus! {:vastaajatunnusid status})
+        (do (db/poista-vastaajatunnus! {:vastaajatunnusid (:vastaajatunnusid status)})
             (api-response "Tunnus poistettu"))
         {:status 404 :body "Tunnuksella on jo vastauksia"}))))
 
