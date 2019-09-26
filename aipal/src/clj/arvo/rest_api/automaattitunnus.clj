@@ -47,6 +47,9 @@
    :kieli s/Str
    (s/optional-key :koulutusmuoto) s/Int})
 
+(s/defschema Tunnus-status
+  {})
+
 
 (defn on-validation-error [message]
     {:status 400
@@ -125,14 +128,14 @@
       :hankintakoulutuksen_toteuttaja (db/hae-oidilla {:taulu "koulutustoimija":oid (:hankintakoulutuksen_toteuttaja data)})
       :tarkenne (:kyselyn_tyyppi data)})))
 
+(defn handle-error [error]
+  (log/error "Virhe vastaajatunnuksen luonnissa: " + (:msg error))
+  (:status 404 :body [error]))
+
 (defn vastauslinkki-response [luotu-tunnus]
   (if {:tunnus luotu-tunnus}
     (api-response {:kysely_linkki (str (:vastaus-base-url @asetukset)"/"(:tunnus luotu-tunnus))})
-    {:status 404 :body [(:error luotu-tunnus)]}))
-
-(defn handle-error [error]
-  (log/error "Virhe vastaajatunnuksen luonnissa: " + (:msg error))
-  {:error error})
+    (handle-error (:error luotu-tunnus))))
 
 (defn lisaa-amispalaute-automatisointi! [tunnus]
   (db/lisaa-automatisointiin! {:koulutustoimija (:valmistavan_koulutuksen_jarjestaja tunnus)
@@ -140,8 +143,6 @@
 
 (defn lisaa-automaattitunnus! [tunnus]
   (let [luotu-tunnus (vastaajatunnus/lisaa-automaattitunnus! tunnus)]
-    (when (:error luotu-tunnus)
-      (log/error "Virhe vastaajatunnuksen luonnissa: " + (:msg (:error luotu-tunnus))))
     (vastauslinkki-response luotu-tunnus)))
 
 (defroutes kyselyynohjaus-v1

@@ -70,7 +70,6 @@
     (-> taustatiedot
         vastaajatunnus/liita-taustatiedot!
         response-or-404))
-
   (GET "/kyselyt" []
     :middleware [auth-mw]
     :header-params [authorization :- String]
