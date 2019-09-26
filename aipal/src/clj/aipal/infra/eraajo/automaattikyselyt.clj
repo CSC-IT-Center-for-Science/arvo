@@ -9,6 +9,7 @@
                                                                      :kayttaja "JARJESTELMA" :tyyppi (:kyselytyyppi kuvaus)
                                                                      :kategoria {:automatisointi_tunniste (:tunniste kuvaus)}}))))]
     (db/liita-kyselyn-kyselypohja! tx {:kyselyid kyselyid :kyselypohjaid (:kyselypohjaid kuvaus) :kayttaja "JARJESTELMA"})
+    (db/liita-kyselyn-kysymykset! tx {:kyselyid kyselyid :kayttaja "JARJESTELMA"})
     (db/luo-kyselykerta! tx {:kyselyid kyselyid :nimi (:kyselykerta_nimi kuvaus) :kayttaja "JARJESTELMA"
                              :automaattinen true :kategoria (:kyselykerta_kategoria kuvaus) :voimassa_alkupvm (:voimassa_alkupvm kuvaus)})
     kyselyid))
