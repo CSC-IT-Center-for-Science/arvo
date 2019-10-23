@@ -299,7 +299,7 @@ angular.module('kyselykerta.kyselykertaui', ['yhteiset.palvelut.i18n', 'ui.boots
         if(kyselytyyppi === 'amispalaute' && vastaajatunnusVoimassaAlkaen){
           // Asetetaan viimeinen sallittu loppupäivämäärä seuraavan rahoituskauden alkuun tai kyselykerran loppupäivä,
           // kumpi vain on ensin. Tähän lisätään 30 päivää vastausaikaa.
-          var rahoituskausiVaihtuu = new Date(tanaan.getFullYear(), 6, 1);
+          var rahoituskausiVaihtuu = new Date(tanaan.getFullYear(), 5, 30);
           if (rahoituskausiVaihtuu < tanaan) {
             rahoituskausiVaihtuu.setFullYear(tanaan.getFullYear() + 1);
           }
