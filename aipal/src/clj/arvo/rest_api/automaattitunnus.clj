@@ -22,11 +22,9 @@
             [aipal.arkisto.koulutustoimija :as koulutustoimija]
             [aipal.arkisto.kyselykerta :as kyselykerta]
             [clojure.tools.logging :as log]
-            [buddy.auth :refer [authenticated? throw-unauthorized]]
             [clj-time.core :as time]
-            [oph.common.util.http-util :refer [parse-iso-date]]
             [arvo.db.core :refer [*db*] :as db]
-            [arvo.util :refer [api-response paginated-response]]
+            [arvo.util :refer [api-response]]
             [aipal.asetukset :refer [asetukset]]))
 
 (s/defschema Amispalaute-tunnus
