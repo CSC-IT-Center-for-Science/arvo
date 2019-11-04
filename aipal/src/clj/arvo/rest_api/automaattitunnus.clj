@@ -192,8 +192,8 @@
     :description (str "Päivämäärät ovat ISO-formaatin mukaisia. Suorituskieli on fi, sv tai en. Tutkintotunnus
         on opintopolun koulutus koodiston 6 numeroinen koodi.")
     (let [tunnus (amispalaute-tunnus data)]
-      (lisaa-amispalaute-automatisointi! tunnus)
       (log/info "Luodaan automaattitunnus, request-id:" (:request-id data))
+      (when (:kyselykertaid tunnus ) (lisaa-amispalaute-automatisointi! tunnus))
       (lisaa-automaattitunnus! tunnus (:request-id data))))
   (GET "/status/:tunnus" []
     :path-params [tunnus :- s/Str]
