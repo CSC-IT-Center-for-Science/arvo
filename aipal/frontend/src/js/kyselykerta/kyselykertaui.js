@@ -303,7 +303,7 @@ angular.module('kyselykerta.kyselykertaui', ['yhteiset.palvelut.i18n', 'ui.boots
           if (rahoituskausiVaihtuu < tanaan) {
             rahoituskausiVaihtuu.setFullYear(tanaan.getFullYear() + 1);
           }
-          var astiMaxLoppupvm = kyselykerta.voimassa_loppupvm < rahoituskausiVaihtuu ? new Date(kyselykerta.voimassa_loppupvm) : rahoituskausiVaihtuu;
+          var astiMaxLoppupvm = kyselykerta.voimassa_loppupvm && kyselykerta.voimassa_loppupvm < rahoituskausiVaihtuu ? new Date(kyselykerta.voimassa_loppupvm) : rahoituskausiVaihtuu;
           astiMaxLoppupvm.setDate(astiMaxLoppupvm.getDate() + 30);
           $scope.astiMaxLoppupvm = astiMaxLoppupvm;
 
