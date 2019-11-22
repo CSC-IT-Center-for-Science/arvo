@@ -24,16 +24,6 @@
             [oph.korma.common :refer [select-unique-or-nil select-unique unique-or-nil]]
             [aipal.auditlog :as auditlog]))
 
-(defn kysely-kentat
-  [query]
-  (->
-    query
-    (sql/fields :kysely.kyselyid :kysely.nimi_fi :kysely.nimi_sv :kysely.nimi_en
-                :kysely.voimassa_alkupvm :kysely.voimassa_loppupvm
-                :kysely.tila :kysely.kaytettavissa :uudelleenohjaus_url :kysely.sivutettu
-                [(sql/raw "now() < voimassa_alkupvm") :tulevaisuudessa]
-                [(sql/raw "CASE WHEN kysely.tila='luonnos' THEN 'luonnos' WHEN kysely.kaytettavissa OR now() < kysely.voimassa_alkupvm THEN 'julkaistu' ELSE 'suljettu' END") :sijainti])))
-
 (def ^:private kysely-poistettavissa-query
   (->
     (sql/select* taulut/kysely)
@@ -66,14 +56,6 @@
 
 (defn hae-kyselytyypit []
   (db/hae-kyselytyypit))
-
-(defn hae-organisaatiotieto
-  "Hakee kyselyn luoneen organisaation tiedot"
-  [kyselyid]
-  (select-unique
-    :kysely_organisaatio_view
-    (sql/fields :koulutustoimija)
-    (sql/where {:kyselyid kyselyid})))
 
 (defn lisaa!
   "Lisää uuden kyselyn"
@@ -126,8 +108,6 @@
                                       (sql/fields :vastaajatunnusid)
                                       (sql/where {:kyselykertaid [in (sql/subselect taulut/kyselykerta (sql/fields :kyselykertaid) (sql/where {:kyselyid kyselyid}))]}))]
     (auditlog/kysely-poisto! kyselyid)
-    (sql/delete taulut/vastaajatunnus_tiedot
-      (sql/where {:vastaajatunnus_id [in vastaajatunnusids]}))
     (sql/delete taulut/vastaajatunnus
       (sql/where {:kyselykertaid [in vastaajatunnusids]}))
     (sql/delete taulut/kyselykerta
