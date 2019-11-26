@@ -147,8 +147,6 @@ angular.module('kysely.kyselyui', ['rest.kysely', 'rest.kyselypohja',
               Kyselypohja.hae(kysely.kyselypohjaid).success(function(kp){
                 $scope.kyselypohja = kp
               });
-
-              console.log("KYselypohjaid:" + kysely.kyselypohjaid)
             }
 
             if(kopioi) {
@@ -244,7 +242,6 @@ angular.module('kysely.kyselyui', ['rest.kysely', 'rest.kyselypohja',
                                  kysymysryhmat: _.map(kysymysryhmat, 'kysymysryhmaid')};
                 _.map(kysymysryhmat, function(kr){_.set(kr, 'kyselypohjaid', pohja.id)});
                 apu.lisaaUniikitKysymysryhmatKyselyyn($scope.kysely, kysymysryhmat);
-              console.log("Kyselypohja: " + JSON.stringify(kyselypohja));
                 if(pohja.valtakunnallinen){
                     $scope.kysely.kyselypohjaid = pohja.id;
                     $scope.kyselypohja = pohja;
