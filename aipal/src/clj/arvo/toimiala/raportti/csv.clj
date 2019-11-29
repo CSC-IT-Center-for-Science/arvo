@@ -23,7 +23,7 @@
                                 :vastaus "Vastaus"
                                 :voimassa_alkupvm "Voimassa alkaen"
                                 :voimassa_loppupvm "Voimassaolo päättyy"
-                                :tutkintotunnus "Tutkinto" :vastausten_lkm "Vastauksia" :vastaajien_lkm "Vastaajien lkm"
+                                :tutkintotunnus "Tutkinto" :vastausten_lkm "Vastaajien lkm" :vastaajien_lkm "Kohteiden lkm"
                                 :tutkinto_selite "Tutkinnon nimi"
                                 :hankintakoulutuksen_toteuttaja_selite "Hankintakoulutuksen toteuttajan nimi"
                                 :toimipaikka_selite "Toimipaikan nimi"
