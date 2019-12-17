@@ -124,6 +124,28 @@ angular.module('kysely.kyselyui', ['rest.kysely', 'rest.kyselypohja',
         return $scope.kysely && $scope.kysely.tila === 'julkaistu';
       };
 
+      function haeKyselypohja(kyselypohjaid){
+        Kyselypohja.hae(kyselypohjaid).success(function(kyselypohja){
+          Kyselypohja.haeKysymysryhmat(kyselypohja.kyselypohjaid).success(
+            function (kysymysryhmat){
+              const pohja = {id: kyselypohja.kyselypohjaid,
+                nimi_fi: kyselypohja.nimi_fi,
+                nimi_sv: kyselypohja.nimi_sv,
+                nimi_en: kyselypohja.nimi_en,
+                valtakunnallinen: kyselypohja.valtakunnallinen,
+                kysymysryhmat: _.map(kysymysryhmat, 'kysymysryhmaid')};
+              _.map(kysymysryhmat, function(kr){_.set(kr, 'kyselypohjaid', pohja.id)});
+              apu.lisaaUniikitKysymysryhmatKyselyyn($scope.kysely, kysymysryhmat);
+              if(pohja.valtakunnallinen){
+                $scope.kysely.kyselypohjaid = pohja.id;
+                $scope.kyselypohja = pohja;
+              }
+              $scope.kyselyForm.$setDirty();
+            }
+          )
+        })
+      }
+
       $scope.kyselytyypit = [];
 
       $scope.kyselypohjat = [];
@@ -144,9 +166,27 @@ angular.module('kysely.kyselyui', ['rest.kysely', 'rest.kyselypohja',
 
               $scope.kyselypohjat.push(kysely.kyselypohjaid)
 
-              Kyselypohja.hae(kysely.kyselypohjaid).success(function(kp){
-                $scope.kyselypohja = kp
-              });
+              haeKyselypohja(kysely.kyselypohjaid)
+
+              // Kyselypohja.hae(kysely.kyselypohjaid).success(function(kyselypohja){
+              //   Kyselypohja.haeKysymysryhmat(kyselypohja.kyselypohjaid).success(
+              //     function (kysymysryhmat){
+              //       const pohja = {id: kyselypohja.kyselypohjaid,
+              //         nimi_fi: kyselypohja.nimi_fi,
+              //         nimi_sv: kyselypohja.nimi_sv,
+              //         nimi_en: kyselypohja.nimi_en,
+              //         valtakunnallinen: kyselypohja.valtakunnallinen,
+              //         kysymysryhmat: _.map(kysymysryhmat, 'kysymysryhmaid')};
+              //       _.map(kysymysryhmat, function(kr){_.set(kr, 'kyselypohjaid', pohja.id)});
+              //       apu.lisaaUniikitKysymysryhmatKyselyyn($scope.kysely, kysymysryhmat);
+              //       if(pohja.valtakunnallinen){
+              //         $scope.kysely.kyselypohjaid = pohja.id;
+              //         $scope.kyselypohja = pohja;
+              //       }
+              //       $scope.kyselyForm.$setDirty();
+              //     }
+              //   )
+              // });
             }
 
             if(kopioi) {
@@ -219,9 +259,10 @@ angular.module('kysely.kyselyui', ['rest.kysely', 'rest.kyselypohja',
       };
 
       $scope.poistaKyselypohja = function(){
+        console.log("Kyselypohja: " + JSON.stringify($scope.kyselypohja))
         $scope.kysely.kysymysryhmat = _.reject($scope.kysely.kysymysryhmat,
           function(kr){
-          return _.includes(_.map($scope.kyselypohja.kysymysryhmat, 'kysymysryhmaid'), kr.kysymysryhmaid)});
+          return !(_.includes(_.map($scope.kyselypohja.kysymysryhmat, 'kysymysryhmaid'), kr.kysymysryhmaid))});
         $scope.kysely.kyselypohjaid = null;
         $scope.kyselypohja = null;
       };
@@ -235,23 +276,27 @@ angular.module('kysely.kyselyui', ['rest.kysely', 'rest.kyselypohja',
             }}
         });
         modalInstance.result.then(function (kyselypohja) {
-          Kyselypohja.haeKysymysryhmat(kyselypohja.kyselypohjaid).success(
-            function (kysymysryhmat){
-                const pohja = {id: kyselypohja.kyselypohjaid,
-                                 valtakunnallinen: kyselypohja.valtakunnallinen,
-                                 kysymysryhmat: _.map(kysymysryhmat, 'kysymysryhmaid')};
-                _.map(kysymysryhmat, function(kr){_.set(kr, 'kyselypohjaid', pohja.id)});
-                apu.lisaaUniikitKysymysryhmatKyselyyn($scope.kysely, kysymysryhmat);
-                if(pohja.valtakunnallinen){
-                    $scope.kysely.kyselypohjaid = pohja.id;
-                    $scope.kyselypohja = pohja;
-                  }
-                $scope.kyselyForm.$setDirty();
-              }
-          )
-          .error(function(){
-            ilmoitus.virhe(i18n.hae('kysely.pohjan_haku_epaonnistui'));
-          });
+          haeKyselypohja(kyselypohja.kyselypohjaid)
+          // Kyselypohja.haeKysymysryhmat(kyselypohja.kyselypohjaid).success(
+          //   function (kysymysryhmat){
+          //       const pohja = {id: kyselypohja.kyselypohjaid,
+          //                      nimi_fi: kyselypohja.nimi_fi,
+          //                      nimi_sv: kyselypohja.nimi_sv,
+          //                      nimi_en: kyselypohja.nimi_en,
+          //                      valtakunnallinen: kyselypohja.valtakunnallinen,
+          //                      kysymysryhmat: _.map(kysymysryhmat, 'kysymysryhmaid')};
+          //       _.map(kysymysryhmat, function(kr){_.set(kr, 'kyselypohjaid', pohja.id)});
+          //       apu.lisaaUniikitKysymysryhmatKyselyyn($scope.kysely, kysymysryhmat);
+          //       if(pohja.valtakunnallinen){
+          //           $scope.kysely.kyselypohjaid = pohja.id;
+          //           $scope.kyselypohja = pohja;
+          //         }
+          //       $scope.kyselyForm.$setDirty();
+          //     }
+          // )
+          // .error(function(){
+          //   ilmoitus.virhe(i18n.hae('kysely.pohjan_haku_epaonnistui'));
+          // });
         });
       };
 
