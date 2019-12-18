@@ -107,7 +107,7 @@
             <span class="fa fa-plus"></span>
         </button>
         <span ng-if="kyselypohja">
-            Kyselypohja: {{kyselypohja| lokalisoiKentta:'nimi'}}
+            {{i18n.kyselypohja.kyselypohja}}: {{kyselypohja| lokalisoiKentta:'nimi'}}
             <a ng-click="poistaKyselypohja()"> <span class="fa fa-trash"></span></a>
         </span>
     </div>
