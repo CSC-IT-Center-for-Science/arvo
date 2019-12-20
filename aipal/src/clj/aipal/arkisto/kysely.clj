@@ -82,25 +82,18 @@
 
 (defn julkaise-kysely! [kyselyid]
   (auditlog/kysely-muokkaus! kyselyid :julkaistu)
-  (sql/update taulut/kysely
-    (sql/set-fields {:tila "julkaistu" :muutettu_kayttaja (:oid *kayttaja*)})
-    (sql/where {:kyselyid kyselyid}))
+  (db/muuta-kyselyn-tila! {:kyselyid kyselyid :tila "julkaistu" :kayttaja (:oid *kayttaja*)})
   ;; haetaan kysely, jotta saadaan myös kaytettavissa tieto mukaan paluuarvona
   (hae kyselyid))
 
 (defn palauta-luonnokseksi! [kyselyid]
   (auditlog/kysely-muokkaus! kyselyid :luonnos)
-  (sql/update taulut/kysely
-    (sql/set-fields {:tila "luonnos" :muutettu_kayttaja (:oid *kayttaja*)})
-    (sql/where {:kyselyid kyselyid
-                :tila "julkaistu"}))
+  (db/muuta-kyselyn-tila! {:kyselyid kyselyid :tila "luonnos" :kayttaja (:oid *kayttaja*)})
   (hae kyselyid))
 
 (defn sulje-kysely! [kyselyid]
   (auditlog/kysely-muokkaus! kyselyid :suljettu)
-  (sql/update taulut/kysely
-    (sql/set-fields {:tila "suljettu" :muutettu_kayttaja (:oid *kayttaja*)})
-    (sql/where {:kyselyid kyselyid}))
+  (db/muuta-kyselyn-tila! {:kyselyid kyselyid :tila "suljettu" :kayttaja (:oid *kayttaja*)})
   (hae kyselyid))
 
 (defn poista-kysely! [kyselyid]
