@@ -50,7 +50,8 @@
                  [mount "0.1.11"]
                  [conman "0.6.6"]
                  [org.flatland/useful "0.11.5"]
-                 [migratus "1.0.6"]]
+                 [migratus "1.0.6"]
+                 [listora/again "1.0.0"]]
 
   :plugins [[test2junit "1.0.1"]
             [codox "0.8.12"]
