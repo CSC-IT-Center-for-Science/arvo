@@ -52,7 +52,9 @@
                  [conman "0.6.6"]
                  [org.flatland/useful "0.11.5"]
                  [migratus "1.0.6"]
-                 [listora/again "1.0.0"]]
+                 [cprop "0.1.14"]
+                 [listora/again "1.0.0"]
+                 [biz.paluch.logging/logstash-gelf "1.14.0"]]
 
   :plugins [[test2junit "1.0.1"]
             [codox "0.8.12"]

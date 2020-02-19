@@ -25,7 +25,7 @@
             [clj-time.core :as time]
             [arvo.db.core :refer [*db*] :as db]
             [arvo.util :refer [api-response]]
-            [aipal.asetukset :refer [asetukset]]
+            [arvo.config :refer [env]]
             [clj-time.format :as f]))
 
 (s/defschema Amispalaute-tunnus
@@ -135,7 +135,7 @@
 
 (defn vastauslinkki-response [luotu-tunnus request-id]
   (if (:tunnus luotu-tunnus)
-    (api-response {:kysely_linkki (str (:vastaus-base-url @asetukset)"/"(:tunnus luotu-tunnus))
+    (api-response {:kysely_linkki (str (:vastaus-base-url env)"/"(:tunnus luotu-tunnus))
                    :voimassa_loppupvm (f/unparse (f/formatters :date)(:voimassa_loppupvm luotu-tunnus))})
     (handle-error (:error luotu-tunnus) request-id)))
 

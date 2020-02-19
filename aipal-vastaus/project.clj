@@ -21,7 +21,7 @@
                  [com.cemerick/valip "0.3.2"]
                  [com.jolbox/bonecp "0.8.0.RELEASE"]
                  [compojure "1.4.0"]
-                 [http-kit "2.1.19"]
+                 [http-kit "2.3.0"]
                  [korma "0.4.2"]
                  [metosin/compojure-api "1.0.0"]
                  [org.clojure/clojure "1.8.0"]

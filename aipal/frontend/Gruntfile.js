@@ -19,6 +19,7 @@ module.exports = function (grunt) {
   require('load-grunt-tasks')(grunt);
   require('time-grunt')(grunt);
 
+  const sass = require('node-sass');
   var distDir = '../resources/public/app';
 
   grunt.initConfig({
@@ -75,7 +76,7 @@ module.exports = function (grunt) {
       options: {
         jshintrc: '.jshintrc',
         reporter: require('jshint-stylish'),
-        reporterOutput: '' 
+        reporterOutput: ''
       },
       all: [
         'Gruntfile.js',
@@ -106,6 +107,7 @@ module.exports = function (grunt) {
       }
     },
     sass: {
+      options: {implementation: sass},
       compile : {
         files: {
           'src/compiled_css/main.css': 'src/sass/main.scss'

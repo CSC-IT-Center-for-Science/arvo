@@ -7,7 +7,7 @@
             [arvo.integraatio.kyselyynohjaus :as ko]
             [schema.core :as s]
             [arvo.util :refer [api-response paginated-response]]
-            [aipal.asetukset :refer [asetukset]]))
+            [arvo.config :refer [env]]))
 
 (defn export-params [request type]
   (let [params {:koulutustoimija (:organisaatio request)
@@ -36,14 +36,14 @@
                    {since :- s/Int nil}
                    {limit :- s/Int nil}]
     (let [query-params {:alkupvm alkupvm :loppupvm loppupvm :since since :limit limit}
-          page-length (if limit (min limit (:api-page-length @asetukset)) (:api-page-length @asetukset))
+          page-length (if limit (min limit (:api-page-length env)) (:api-page-length env))
           data (db/export-vastaukset (apply merge {:pagelength page-length} query-params (export-params request "vastaukset")))]
       (paginated-response data :vastausid page-length (str api-location "vastaukset") query-params)))
   (GET "/vastaajat" [:as request]
     :return {:data [Vastaajatunnus] :pagination Pagination}
     :query-params [{since :- s/Int nil}
                    {limit :- s/Int nil}]
-    (let [page-length (if limit (min limit (:api-page-length @asetukset)) (:api-page-length @asetukset))
+    (let [page-length (if limit (min limit (:api-page-length env)) (:api-page-length env))
           sql-params (merge {:pagelength page-length :since since}(export-params request "taustatiedot"))]
       (paginated-response (db/export-taustatiedot sql-params) :vastaajaid page-length (str api-location "vastaajat") {:limit limit})))
   (GET "/opiskeluoikeudet" [:as request]

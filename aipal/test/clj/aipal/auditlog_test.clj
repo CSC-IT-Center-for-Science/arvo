@@ -49,5 +49,5 @@
             (.contains msg
               "\"target\":{\"kyselypohja\":null,\"id\":\"123\"},\"serviceName\":\"aipal\",\"version\":1,")
             (.contains msg
-               "\"user\":{\"oid\":\"T-X-oid\",\"ip\":\"192.168.50.1\",\"session\":\"955d43a3-c02d-4ab8-a61f-141f29c44a84\",\"userAgent\":\"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.90 Safari/537.36\"}}")
-           )))))
+               "\"user\":{\"oid\":\"T-X-oid\",\"ip\":\"192.168.50.1\",\"session\":\"955d43a3-c02d-4ab8-a61f-141f29c44a84\",\"userAgent\":\"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.90 Safari/537.36\"}}"))))))
+

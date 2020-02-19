@@ -1,6 +1,6 @@
 (ns arvo.db.migrations
   (:require [migratus.core :as migratus]
-            [aipal.asetukset :refer [asetukset]]
+            [arvo.config :refer [env]]
             [clojure.tools.logging :as log]))
 
 (defn parse-ids [args]
@@ -8,7 +8,7 @@
 
 (defn migrate [args]
   (log/info "Ajetaan kantamigraatiot" args)
-  (let [db-conf (:db @asetukset)
+  (let [db-conf (:db env)
         config {:store :database
                 :db {:connection-uri (str "jdbc:postgresql://" (:host db-conf)
                                           "/"(:name db-conf)"?user="(:migration-user db-conf)"&password=" (:migration-password db-conf))}}]

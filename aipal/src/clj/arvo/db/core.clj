@@ -2,7 +2,7 @@
   (:require [hugsql.core :as hugsql]
             [mount.core :as mount]
             [conman.core :as conman]
-            [aipal.asetukset :refer [asetukset]]
+            [arvo.config :refer [env]]
             [clojure.java.jdbc :as jdbc]
             [cheshire.core :refer [parse-string generate-string]]
             [clj-time.coerce :as c]
@@ -15,7 +15,7 @@
 (require 'clj-time.jdbc)
 
 (defn pool-spec []
-  (let [db-conf (:db @asetukset)]
+  (let [db-conf (:db env)]
     {:jdbc-url (str "jdbc:postgresql://" (:host db-conf)
                     "/"(:name db-conf)"?user="(:user db-conf)"&password=" (:password db-conf))}))
 

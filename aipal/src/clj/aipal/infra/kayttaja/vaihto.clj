@@ -3,7 +3,7 @@
 ;; nimiavaruudesta aipal.infra.kayttaja.
 (ns aipal.infra.kayttaja.vaihto
   (:require [clojure.tools.logging :as log]
-            [aipal.asetukset :refer [asetukset]]
+            [arvo.config :refer [env]]
             [oph.common.util.util :refer [map-by some-value]]
             [aipal.infra.kayttaja :refer [*kayttaja*]]
             [aipal.infra.kayttaja.vakiot :refer [jarjestelma-oid integraatio-uid]]
@@ -48,7 +48,7 @@
 
 (defn with-kayttaja* [uid impersonoitu-oid vaihdettu-organisaatio rooli f]
   (log/debug "Yritetään autentikoida käyttäjä" uid)
-  (if-let [k (db/hae-voimassaoleva-kayttaja {:uid uid :voimassaolo (:kayttooikeus-tarkistusvali @asetukset)})]
+  (if-let [k (db/hae-voimassaoleva-kayttaja {:uid uid :voimassaolo (:kayttooikeus-tarkistusvali env)})]
     (let [aktiivinen-oid (or impersonoitu-oid (:oid k))
           roolit (db/hae-voimassaolevat-roolit {:kayttajaOid aktiivinen-oid})]
       (autentikoi-kayttaja (assoc k :roolit roolit) impersonoitu-oid vaihdettu-organisaatio rooli f))

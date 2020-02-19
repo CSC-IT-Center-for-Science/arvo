@@ -17,7 +17,7 @@
             [oph.common.util.cas :as cas]
             [cheshire.core :as cheshire]
             [clojure.walk :refer [keywordize-keys]]
-            [aipal.asetukset :refer [asetukset]]
+            [arvo.config :refer [env]]
             [oph.common.util.util :refer [get-json-from-url]]
             [aipal.toimiala.kayttajaroolit :refer [koulutustoimija-roolit
                                                    oph-roolit]]))
@@ -59,8 +59,8 @@
 
 (defn kayttaja [uid ldap-ryhma->rooli oid->ytunnus]
   (log/info "Haetaan käyttäjän" uid "tiedot Opintopolusta")
-  (let [kayttooikeus-url (str (-> @asetukset :kayttooikeuspalvelu :url) "/kayttooikeus/kayttaja")
-        oppijanumerorekisteri-url (str (-> @asetukset :oppijanumerorekisteri :url) "/henkilo/")
+  (let [kayttooikeus-url (str (-> env :kayttooikeuspalvelu :url) "/kayttooikeus/kayttaja")
+        oppijanumerorekisteri-url (str (-> env :oppijanumerorekisteri :url) "/henkilo/")
         kayttaja (first (palvelukutsu :kayttooikeuspalvelu kayttooikeus-url {:query-params {"username" uid}}))
         roolit (->> (kayttoikeudet kayttaja uid ldap-ryhma->rooli oid->ytunnus)
                     flatten
@@ -75,7 +75,7 @@
      :roolit roolit}))
 
 (defn kaikki-oidit [oid]
-  (let [oppijanumerorekisteri-url (format "%s/s2s/duplicateHenkilos" (-> @asetukset :oppijanumerorekisteri :url))
+  (let [oppijanumerorekisteri-url (format "%s/s2s/duplicateHenkilos" (-> env :oppijanumerorekisteri :url))
         vastaus (postpalvelukutsu :oppijanumerorekisteri oppijanumerorekisteri-url {:body (format "{\"henkiloOids\": [\"%s\"]}" oid) :content-type :json})
         oidit (->> vastaus
                    (mapcat vals)

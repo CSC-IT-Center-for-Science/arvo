@@ -127,7 +127,7 @@
         (Math/round (float (* 100 (- (/ suosittelijat yhteensä) (/ arvostelijat yhteensä)))))))))
 
 (defn kasittele-npskysymys [kysymys vastaukset]
-  (let [npskysymys (kasittele-asteikkokysymys kysymys vastaukset 11 :alku 0) ]
+  (let [npskysymys (kasittele-asteikkokysymys kysymys vastaukset 11 :alku 0)]
     (assoc npskysymys :nps_luku (laske-nps-luku (:jakauma npskysymys)))))
 
 (defn kasittele-monivalintakysymys [kysymys vastaukset]

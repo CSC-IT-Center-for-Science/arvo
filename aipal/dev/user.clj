@@ -16,6 +16,7 @@
   (:require [clojure.repl :refer :all]
             [clojure.pprint :refer [pprint]]
             [clojure.java.shell :refer [with-sh-dir sh]]
+            [aipal.palvelin :refer [kaynnista!]]
             [clojure.tools.namespace.repl :as nsr]
             clojure.core.cache
             schema.core
@@ -26,24 +27,13 @@
 ;; Templatejen kakutus pois päältä kehityksen aikana
 (stencil.loader/set-cache (clojure.core.cache/ttl-cache-factory {} :ttl 0))
 
-(def frontend-kaannoskomennot ["npm install"
-                               "bower install"
-                               "grunt build"])
-
-(defn kaanna-frontend []
-  (with-sh-dir "frontend"
-    (doseq [komento frontend-kaannoskomennot]
-      (println "$" komento)
-      (let [{:keys [err out]} (sh "bash" "-l" "-c" komento)]
-        (println err out)))))
-
 (defonce ^:private palvelin (atom nil))
 
 (defn ^:private repl-asetukset
   "Muutetaan oletusasetuksia siten että saadaan järkevät asetukset kehitystyötä varten"
   []
   (->
-    @(ns-resolve 'aipal.asetukset 'oletusasetukset)
+    ;@(ns-resolve 'aipal.asetukset 'oletusasetukset)
     (assoc :development-mode true
            :raportointi-minimivastaajat -1
            :cas-auth-server {:url "https://virkailija.testiopintopolku.fi/cas"
@@ -58,8 +48,7 @@
 (defn start [& args]
   {:pre [(not @palvelin)]
    :post [@palvelin]}
-  (require 'aipal.palvelin)
-  (reset! palvelin ((ns-resolve 'aipal.palvelin 'kaynnista!) @(ns-resolve 'aipal.asetukset 'oletusasetukset) args)))
+  (reset! palvelin (kaynnista! args)))
 
 (defn stop []
   {:pre [@palvelin]
