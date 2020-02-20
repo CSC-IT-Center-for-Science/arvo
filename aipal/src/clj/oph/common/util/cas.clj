@@ -27,50 +27,43 @@
       body
       (throw (RuntimeException. "Service ticketin pyytäminen CASilta epäonnistui")))))
 
-(defmulti kirjautumisyritys ::again/status)
-(defmethod kirjautumisyritys :retry [s]
-  (log/warn "RETRY" s)
-  (log/info (:cs @kirjautumistila))
+(defn uusi-service-ticket [palvelu-url unsafe-https prequel-url]
+  (try
+    (let [service-ticket (hae-service-ticket (:tgt @kirjautumistila) (str palvelu-url "/j_spring_cas_security_check") unsafe-https)]
+      ; Tyhjennä keksit (sessio keksi saattaa olla rikki) ja hae uusi ST
+      (swap! kirjautumistila assoc :cs (clj-http.cookies/cookie-store))
+      ; Lämmittelypyyntö. Ilman tätä muut kuin get-pyynnöt epäonnistuvat (ohjaa kirjautumissivulle)
+      (http/get prequel-url (oletus-header {:query-params {"ticket" service-ticket} :cookie-store (:cs @kirjautumistila)})))
+    (catch Exception e (str "Ei pystytty hakemaan ST" (.getMessage e)))))
+
+(defmulti tiketit-uusiva-kirjautuminen ::again/status)
+(defmethod tiketit-uusiva-kirjautuminen :retry [s]
+  (log/info (format "Uudelleenyritys#%s koska %s" (::again/attempts s) (:cause (Throwable->map (::again/exception s)))))
   (let [{cas-url :url
          unsafe-https :unsafe-https} (:cas-auth-server @asetukset)
         {palvelu-url :url
          user :user
          password :password} (get @asetukset (-> s ::again/user-context deref :palvelu))
         prequel-url (format "%s/cas/prequel" palvelu-url)
-        yritettyuudestaan? (-> s ::again/user-context deref :retried?)
-        _ (when (or (not (:tgt @kirjautumistila)) yritettyuudestaan?)
-            (swap! kirjautumistila assoc :tgt (hae-ticket-granting-url cas-url user password unsafe-https)))
-        ;    Tyhjennä keksit ja hae uusi ST
-        service-ticket (hae-service-ticket (:tgt @kirjautumistila) (str palvelu-url "/j_spring_cas_security_check") unsafe-https)]
-    (swap! kirjautumistila assoc :cs (clj-http.cookies/cookie-store))
-    (log/info (:cs @kirjautumistila))
-    ; Lämmittelypyyntö. Ilman tätä muut kuin get-pyynnöt epäonnistuvat (ohjaa kirjautumissivulle)
-    (http/get prequel-url (oletus-header {:query-params {"ticket" service-ticket} :cookie-store (:cs @kirjautumistila)})))
-  (swap! (::again/user-context s) assoc :retried? true))
-(defmethod kirjautumisyritys :success [s]
-  (if (-> s ::again/user-context deref :retried?)
-    (log/info "SUCCESS after" (::again/attempts s) "attempts" s)
-    (log/info "SUCCESS on first attempt" s)))
-(defmethod kirjautumisyritys :failure [s]
-  (log/error "FAILURE" s))
-
-(defn pyynto [options]
-  (let [vastaus (http/request (oletus-header (assoc options :cookie-store (:cs @kirjautumistila))))]
-    (log/info (:status vastaus))
-    (log/info (:cs @kirjautumistila))
-    (if (=(:status vastaus) 302)
-      (throw (Exception. "Poikkeus"))
-      vastaus)))
+        yritetty-uudestaan? (< 1 (::again/attempts s))
+        _ (when (or (not (:tgt @kirjautumistila)) yritetty-uudestaan?)
+            (do
+              (log/info "Uusitaan TGT")
+              (swap! kirjautumistila assoc :tgt (hae-ticket-granting-url cas-url user password unsafe-https))))]
+        (uusi-service-ticket palvelu-url unsafe-https prequel-url)))
+(defmethod tiketit-uusiva-kirjautuminen :success [s])
+(defmethod tiketit-uusiva-kirjautuminen :failure [s]
+  (log/error "Pyyntö epäonnistui tikettien uusimisesta huolimatta" s))
 
 (defn request-with-cas-auth [palvelu options]
   (let [{cas-enabled :enabled} (:cas-auth-server @asetukset)]
     (if cas-enabled
       (again/with-retries
-       {::again/callback     kirjautumisyritys
+       {::again/callback     tiketit-uusiva-kirjautuminen
         ::again/strategy     [100 100]
         ::again/user-context (atom {:palvelu palvelu})}
-;       TODO: testaa virheillä https://httpbin.org/status/500
-       (pyynto options))
+        ; 302 halutaan tulkita tässä virheeksi (ohjaus kirjautumissivulle). 2xx ja 4xx hyväksytään.
+       (http/request (oletus-header (assoc options :cookie-store (:cs @kirjautumistila) :unexceptional-status #(or (<= 200 % 299) (<= 400 % 499)) ))))
       (http/request (oletus-header options)))))
 
 (defn get-with-cas-auth
