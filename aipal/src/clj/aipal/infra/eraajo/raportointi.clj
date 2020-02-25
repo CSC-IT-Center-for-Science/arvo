@@ -15,7 +15,6 @@
 (ns aipal.infra.eraajo.raportointi
   (:require [clojure.tools.logging :as log]
             [aipal.toimiala.raportti.valtakunnallinen :as raportti]
-            [aipal.arkisto.vipunen :as vipunen]
             [aipal.infra.kayttaja.vaihto :refer [with-kayttaja]]
             [aipal.infra.kayttaja.vakiot :refer [jarjestelma-uid]]))
 

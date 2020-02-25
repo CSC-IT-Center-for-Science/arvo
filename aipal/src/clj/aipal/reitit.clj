@@ -33,7 +33,6 @@
             aipal.rest-api.tutkintotyyppi
             aipal.rest-api.koulutustoimija
             aipal.rest-api.tiedote
-            aipal.rest-api.vipunen
             arvo.rest-api.export
             [compojure.api.middleware :as mw]
             [arvo.auth.api :refer [wrap-authentication]]
