@@ -63,7 +63,7 @@
         ::again/strategy     [100 100]
         ::again/user-context (atom {:palvelu palvelu})}
         ; 302 halutaan tulkita tässä virheeksi (ohjaus kirjautumissivulle). 2xx ja 4xx hyväksytään.
-       (http/request (oletus-header (assoc options :cookie-store (:cs @kirjautumistila) :unexceptional-status #(or (<= 200 % 299) (<= 400 % 499)) ))))
+       (http/request (oletus-header (assoc options :cookie-store (:cs @kirjautumistila) :redirect-strategy :none :unexceptional-status #(or (<= 200 % 299) (<= 400 % 499)) ))))
       (http/request (oletus-header options)))))
 
 (defn get-with-cas-auth
