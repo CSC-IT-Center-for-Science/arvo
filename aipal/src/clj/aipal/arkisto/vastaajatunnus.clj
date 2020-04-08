@@ -151,7 +151,6 @@
       (-> (lisaa! vastaajatunnus)
           first
           (select-keys [:tunnus :voimassa_loppupvm])))
-       ;{:tunnus (:tunnus (first (lisaa! vastaajatunnus)))})
     {:error (:ei-kyselykertaa errors)}))
 
 (defn lisaa-massana! [vastaajatunnukset]
