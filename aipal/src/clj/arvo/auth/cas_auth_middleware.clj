@@ -5,34 +5,46 @@
             [clojure.tools.logging :as log])
   (:import
     (org.jasig.cas.client.validation Cas10TicketValidator TicketValidator AbstractUrlBasedTicketValidator AbstractUrlBasedTicketValidator TicketValidationException AssertionImpl)
-    (java.io InputStreamReader StringReader BufferedReader)
-    (java.lang StringBuilder)))
+    (java.io InputStreamReader StringReader BufferedReader IOException)
+    (java.lang StringBuilder)
+    (javax.net.ssl HttpsURLConnection)
+    (java.net HttpURLConnection)))
 
 
 (defn- get-response-from-server [validation-url ticket]
   (let [conn (.openConnection validation-url)]
-;    (when (instance? HttpsURLConnection conn)
-;      (.setHostnameVerifier conn hostname-verifier))
-    (.setRequestProperty conn "Caller-Id" "1.2.246.562.10.2013112012294919827487.arvo")
-    (let [input-stream-reader (InputStreamReader. (.getInputStream conn))
-          buffered-reader (BufferedReader. input-stream-reader)
-          string-buffer (StringBuilder. 255)]
-      (loop [line (.readLine buffered-reader)]
-        (when (not (nil? line))
-          (.append string-buffer line)
-          (.append string-buffer "\n")
-          (recur (.readLine buffered-reader))))
-      (.disconnect conn)
-      (.toString string-buffer))))
+    (try
+      (when (instance? HttpsURLConnection conn)
+        (.setHostnameVerifier conn (HttpsURLConnection/getDefaultHostnameVerifier)))
+      ;    TODO self.hostNameVerifier jos asetettu
+      (.setRequestProperty conn "Caller-Id" "1.2.246.562.10.2013112012294919827487.arvo")
+      (let [input-stream-reader (InputStreamReader. (.getInputStream conn))
+            buffered-reader (BufferedReader. input-stream-reader)
+            string-buffer (StringBuilder. 255)]
+        (loop [line (.readLine buffered-reader)]
+          (when (not (nil? line))
+            (.append string-buffer line)
+            (.append string-buffer "\n")
+            (recur (.readLine buffered-reader))))
+        (.toString string-buffer))
+      (catch Exception e
+        (log/error (.getMessage e))
+        (throw (RuntimeException. e)))
+      (finally
+        (when (and (some? conn) (instance? HttpURLConnection conn))
+          (.disconnect conn))))))
 
 
 (defn- parse-response-from-server [response]
   (when (not (clojure.string/starts-with? response "yes"))
     (throw (TicketValidationException. "CAS Server could not validate ticket.")))
-  (let [string-reader (StringReader. response)
-        buffered-reader (BufferedReader. string-reader)]
-    (.readLine buffered-reader)
-    (AssertionImpl. (.readLine buffered-reader))))
+  (try
+    (let [string-reader (StringReader. response)
+          buffered-reader (BufferedReader. string-reader)]
+      (.readLine buffered-reader)
+      (AssertionImpl. (.readLine buffered-reader)))
+    (catch IOException e
+      (throw (TicketValidationException. "Unable to parse response." e)))))
 
 (extend-type AbstractUrlBasedTicketValidator
   Validator
