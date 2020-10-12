@@ -15,8 +15,9 @@
   (let [conn (.openConnection validation-url)]
     (try
       (when (instance? HttpsURLConnection conn)
+        ; this.hostNameVerifier ja this.encoding ovat private/protected takana. Jos niitä halutaan hyödyntää
+        ; täytyy käyttää clojure.reflect toiminnallisuutta.
         (.setHostnameVerifier conn (HttpsURLConnection/getDefaultHostnameVerifier)))
-      ;    TODO self.hostNameVerifier jos asetettu
       (.setRequestProperty conn "Caller-Id" "1.2.246.562.10.2013112012294919827487.arvo")
       (let [input-stream-reader (InputStreamReader. (.getInputStream conn))
             buffered-reader (BufferedReader. input-stream-reader)
