@@ -292,10 +292,9 @@ angular.module('kysely.kyselyui', ['rest.kysely', 'rest.kyselypohja',
           templateUrl: 'template/kysely/lisaa-kysymysryhma.html',
           controller: 'LisaaKysymysryhmaModalController',
           resolve: {
-            isJulkaistu: function() {
-              return $scope.isJulkaistu();
-            },
-          },
+            isJulkaistu: function() {return $scope.isJulkaistu();},
+            isPohja: function() {return false;}
+          }
         });
         modalInstance.result.then(function (kysymysryhmaid) {
           Kysymysryhma.haeEsikatselulle(kysymysryhmaid)
@@ -377,9 +376,10 @@ angular.module('kysely.kyselyui', ['rest.kysely', 'rest.kyselypohja',
     };
   }])
 
-  .controller('LisaaKysymysryhmaModalController', ['$uibModalInstance', '$scope', 'Kysymysryhma', 'isJulkaistu', function ($uibModalInstance, $scope, Kysymysryhma, isJulkaistu) {
+  .controller('LisaaKysymysryhmaModalController', ['$uibModalInstance', '$scope', 'Kysymysryhma', 'isJulkaistu', 'isPohja', function ($uibModalInstance, $scope, Kysymysryhma, isJulkaistu, isPohja) {
     $scope.outerscope = {};
     $scope.isJulkaistu = isJulkaistu;
+    $scope.isPohja = isPohja
 
     Kysymysryhma.haeVoimassaolevat().then(function(resp){
       if (!resp.data) {
@@ -387,7 +387,7 @@ angular.module('kysely.kyselyui', ['rest.kysely', 'rest.kyselypohja',
       }
       const kysymysryhmat = resp.data;
       $scope.kysymysryhmat = _.filter(kysymysryhmat, function(kr) {
-        return !kr.valtakunnallinen;
+        return isPohja ? kr.valtakunnallinen : !kr.valtakunnallinen
       });
     }).catch(function (e) {
       console.error(e);
