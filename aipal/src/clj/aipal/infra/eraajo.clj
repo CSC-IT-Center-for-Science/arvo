@@ -74,11 +74,11 @@
                           (j/of-type PaivitaNakymatJob)
                           (j/with-identity "paivita-raportoinnin-nakymat"))
         raportointi-trigger (mk-trigger "raportointi" (ajastus asetukset :raportointi))
-        tutkinnot-job (j/build
+        koodistot-job (j/build
                         (j/of-type PaivitaKoodistotJob)
                         (j/with-identity "paivita-koodistot")
                         (j/using-job-data {"asetukset" (:koodistopalvelu asetukset)}))
-        tutkinnot-trigger (mk-trigger "tutkinnot" (ajastus asetukset :tutkinnot))
+        koodistot-trigger (mk-trigger "tutkinnot" (ajastus asetukset :tutkinnot))
         automaattikyselyt-job (j/build
                                (j/of-type LuoAutomaattikyselytJob)
                                (j/with-identity "luo-automaattikyselyt"))
@@ -87,5 +87,5 @@
     (qs/schedule @ajastin org-job2 org-trigger-once)
     (qs/schedule @ajastin koul-job koul-trigger-daily)
     (qs/schedule @ajastin raportointi-job raportointi-trigger)
-    (qs/schedule @ajastin tutkinnot-job tutkinnot-trigger)
+    (qs/schedule @ajastin koodistot-job koodistot-trigger)
     (qs/schedule @ajastin automaattikyselyt-job automaattikyselyt-trigger)))

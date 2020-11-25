@@ -287,6 +287,7 @@ Koodin arvo laitetaan arvokentta-avaimen alle."
     (korma.db/transaction
      (log/info "Päivitetään muut koodistot")
      (paivita-koodisto! asetukset "maatjavaltiot2")
+     (paivita-koodisto! asetukset "kunta")
      (log/info "Muiden koodistojen päivitys valmis"))
     (catch org.postgresql.util.PSQLException e
       (log/error e "Tutkintojen päivitys koodistopalvelusta epäonnistui"))))
