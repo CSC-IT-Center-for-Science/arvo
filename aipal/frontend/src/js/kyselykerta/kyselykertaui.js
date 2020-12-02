@@ -132,15 +132,7 @@ angular.module('kyselykerta.kyselykertaui', ['yhteiset.palvelut.i18n', 'ui.boots
       $scope.uusi = uusi;
       $scope.kyselykertaid = $routeParams.kyselykertaid;
 
-      Kieli.haeKaikki().then(function(resp) {
-        if (!resp.data) {
-          console.error('resp.data missing');
-        }
-        const kielet = resp.data;
-        $scope.kielet = _.pluck(kielet, 'kieli');
-      }).catch(function (e) {
-        console.error(e);
-      });
+      $scope.kielet = ["fi", "sv", "en"]
 
       function haeTutkinnot(kysely){
         Tutkinto.koulutustoimijanTutkinnot(kysely.tyyppi, false).then(function(resp) {
