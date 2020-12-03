@@ -50,6 +50,7 @@ CREATE TRIGGER jatkovastausm_insert
 BEFORE INSERT ON jatkovastaus FOR EACH ROW EXECUTE PROCEDURE update_stamp();
 
 ALTER TABLE vastaus ADD COLUMN jatkovastausid INTEGER REFERENCES jatkovastaus(jatkovastausid);
+ALTER TABLE kysymys ADD COLUMN jatkokysymysid INTEGER REFERENCES jatkokysymys(jatkokysymysid);
 
 CREATE TABLE kieli
 (

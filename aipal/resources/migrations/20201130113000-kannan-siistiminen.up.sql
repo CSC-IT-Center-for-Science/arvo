@@ -1,5 +1,6 @@
 ALTER TABLE kyselykerta DROP COLUMN IF EXISTS ntm_kysymykset;
 ALTER TABLE vastaus DROP COLUMN IF EXISTS jatkovastausid;
+ALTER TABLE kysymys DROP COLUMN IF EXISTS jatkokysymysid;
 
 DROP TABLE jatkovastaus;
 
