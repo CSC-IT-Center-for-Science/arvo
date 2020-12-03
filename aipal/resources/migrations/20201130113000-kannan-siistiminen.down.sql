@@ -84,3 +84,14 @@ DROP MATERIALIZED VIEW kysymys_vastaaja_view;
 ALTER TABLE kyselykerta
 ALTER COLUMN kategoria SET DATA TYPE json
 USING kategoria::json;
+
+CREATE FUNCTION ei_kysymys(jatkokysymys) RETURNS BOOLEAN STABLE LANGUAGE SQL
+as $$
+SELECT CASE WHEN $1.ei_teksti_fi IS NOT NULL OR $1.ei_teksti_sv IS NOT NULL THEN true ELSE false END;
+$$;
+
+
+CREATE FUNCTION kylla_kysymys(jatkokysymys) RETURNS BOOLEAN STABLE LANGUAGE SQL
+as $$
+SELECT CASE WHEN $1.kylla_teksti_fi IS NOT NULL OR $1.kylla_teksti_sv IS NOT NULL THEN true ELSE false END;
+$$;

@@ -2,6 +2,10 @@ ALTER TABLE kyselykerta DROP COLUMN IF EXISTS ntm_kysymykset;
 ALTER TABLE vastaus DROP COLUMN IF EXISTS jatkovastausid;
 
 DROP TABLE jatkovastaus;
+
+DROP FUNCTION ei_kysymys(jatkokysymys);
+DROP FUNCTION kylla_kysymys(jatkokysymys);
+
 DROP TABLE jatkokysymys;
 
 DROP TABLE kieli;
