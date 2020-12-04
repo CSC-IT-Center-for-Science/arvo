@@ -5,10 +5,14 @@
             [arvo.db.core :refer [*db*] :as db])
   (:import (org.quartz Job)))
 
+(defn rand-str [len]
+  (apply str (take len (repeatedly #(char (+ (rand 26) 65))))))
+
 (defn luo-kysely! [koulutustoimija kuvaus tx]
   (let [kyselyid (:kyselyid (first (db/luo-kysely! tx (merge kuvaus {:tila "julkaistu" :koulutustoimija (:ytunnus koulutustoimija)
                                                                      :kayttaja "JARJESTELMA" :tyyppi (:kyselytyyppi kuvaus)
-                                                                     :kategoria {:automatisointi_tunniste (:tunniste kuvaus)}}))))]
+                                                                     :kategoria {:automatisointi_tunniste (:tunniste kuvaus)
+                                                                                 :esikatselu_tunniste (rand-str 8)}}))))]
     (db/liita-kyselyn-kyselypohja! tx {:kyselyid kyselyid :kyselypohjaid (:kyselypohjaid kuvaus) :kayttaja "JARJESTELMA"})
     (db/liita-kyselyn-kysymykset! tx {:kyselyid kyselyid :kayttaja "JARJESTELMA"})
     ;(db/paata-kyselykerrat! tx {:tyyppi (:kyselytyyppi kuvaus) :koulutustoimija (:ytunnus koulutustoimija) :paattymis_pvm (get-rahoituskauden-loppu (:kyselytyyppi kuvaus))})
