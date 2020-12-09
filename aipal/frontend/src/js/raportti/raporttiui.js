@@ -62,8 +62,8 @@ angular.module('raportti.raporttiui', ['ngRoute', 'rest.raportti', 'rest.tutkint
     };
   }])
 
-  .controller('RaportitController', ['$scope', 'Koulutustoimija', 'Oppilaitos', 'kyselyValilehti', 'kyselykertaValilehti', 'Kieli', 'Kysymysryhma', 'Raportti', 'Tutkinto', 'Tutkintotyyppi', 'kaavioApurit', 'kieli', 'i18n', 'ilmoitus', 'raporttiApurit', 'seuranta',
-    function($scope, Koulutustoimija, Oppilaitos, kyselyValilehti, kyselykertaValilehti, Kieli, Kysymysryhma, Raportti, Tutkinto, Tutkintotyyppi, kaavioApurit, kieli, i18n, ilmoitus, raporttiApurit, seuranta) {
+  .controller('RaportitController', ['$scope', 'Koulutustoimija', 'Oppilaitos', 'kyselyValilehti', 'kyselykertaValilehti', 'Kysymysryhma', 'Raportti', 'Tutkinto', 'Tutkintotyyppi', 'kaavioApurit', 'kieli', 'i18n', 'ilmoitus', 'raporttiApurit', 'seuranta',
+    function($scope, Koulutustoimija, Oppilaitos, kyselyValilehti, kyselykertaValilehti, Kysymysryhma, Raportti, Tutkinto, Tutkintotyyppi, kaavioApurit, kieli, i18n, ilmoitus, raporttiApurit, seuranta) {
     $scope.kyselykertaraportitValittu = !$scope.yllapitaja;
     $scope.raportti = {};
     $scope.raportti.kieli = kieli;
