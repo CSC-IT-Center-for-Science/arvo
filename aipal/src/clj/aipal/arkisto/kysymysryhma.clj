@@ -27,7 +27,7 @@
 (defn ^:private rajaa-kayttajalle-sallittuihin-kysymysryhmiin [query organisaatio]
   (let [koulutustoimijan-oma {:kysymysryhma_organisaatio_view.koulutustoimija organisaatio}
         valtakunnallinen     {:kysymysryhma_organisaatio_view.valtakunnallinen true}
-        lisattavissa         {:kysymysryhma.lisattavissa true}]
+        lisattavissa         {:kysymysryhma.tila "julkaistu"}]
     (cond
       (yllapitaja?)         (-> query
                               (sql/where (or koulutustoimijan-oma
@@ -43,10 +43,10 @@
      (sql/join :inner :kysymysryhma_organisaatio_view (= :kysymysryhma_organisaatio_view.kysymysryhmaid :kysymysryhmaid))
      (rajaa-kayttajalle-sallittuihin-kysymysryhmiin organisaatio)
      (cond->
-       vain-voimassaolevat (sql/where {:kysymysryhma.lisattavissa true}))
+       vain-voimassaolevat (sql/where {:kysymysryhma.tila "julkaistu"}))
      (sql/fields :kysymysryhma.kysymysryhmaid :kysymysryhma.nimi_fi :kysymysryhma.nimi_sv :kysymysryhma.nimi_en
                  :kysymysryhma.selite_fi :kysymysryhma.selite_sv :kysymysryhma.selite_en :kysymysryhma.valtakunnallinen :kysymysryhma.taustakysymykset
-                 :kysymysryhma.lisattavissa :kysymysryhma.tila :kysymysryhma.kuvaus_fi :kysymysryhma.kuvaus_sv :kysymysryhma.kuvaus_en
+                 :kysymysryhma.tila :kysymysryhma.kuvaus_fi :kysymysryhma.kuvaus_sv :kysymysryhma.kuvaus_en
                  [(sql/subselect taulut/kysymys
                     (sql/aggregate (count :*) :lkm)
                     (sql/where {:kysymys.kysymysryhmaid :kysymysryhma.kysymysryhmaid})) :kysymyksien_lkm]
@@ -296,7 +296,7 @@
     (sql/join :inner taulut/kysymysryhma_kyselypohja (= :kysymysryhma_kyselypohja.kysymysryhmaid :kysymysryhma.kysymysryhmaid))
     (sql/fields :kysymysryhma_kyselypohja.kyselypohjaid :kysymysryhma_kyselypohja.jarjestys)
     (sql/where {:kysymysryhma_kyselypohja.kyselypohjaid kyselypohjaid
-                :kysymysryhma.lisattavissa true})
+                :kysymysryhma.tila "julkaistu"})
     (sql/order :kysymysryhma_kyselypohja.jarjestys)
     sql/exec
     (->> (map (comp taydenna-kysymysryhman-monivalintakysymykset vaihda-kysymysavain)))))
