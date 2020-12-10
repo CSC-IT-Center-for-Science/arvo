@@ -39,8 +39,8 @@ angular.module('kyselykerta.kyselykertaui', ['yhteiset.palvelut.i18n', 'ui.boots
       });
   }])
 
-  .controller('KyselykertaController', ['Kyselykerta', 'Kysely', 'Kieli', 'Tutkinto', 'Vastaajatunnus', 'Koulutustoimija', 'tallennusMuistutus', '$location', '$uibModal', '$routeParams', '$scope', 'ilmoitus', 'i18n', 'uusi', 'varmistus', 'pvm','kayttooikeudet', 'kieli',
-    function (Kyselykerta, Kysely, Kieli, Tutkinto, Vastaajatunnus, Koulutustoimija, tallennusMuistutus, $location, $uibModal, $routeParams, $scope, ilmoitus, i18n, uusi, varmistus, pvm, kayttooikeudet, kieli) {
+  .controller('KyselykertaController', ['Kyselykerta', 'Kysely', 'Tutkinto', 'Vastaajatunnus', 'Koulutustoimija', 'tallennusMuistutus', '$location', '$uibModal', '$routeParams', '$scope', 'ilmoitus', 'i18n', 'uusi', 'varmistus', 'pvm','kayttooikeudet', 'kieli',
+    function (Kyselykerta, Kysely, Tutkinto, Vastaajatunnus, Koulutustoimija, tallennusMuistutus, $location, $uibModal, $routeParams, $scope, ilmoitus, i18n, uusi, varmistus, pvm, kayttooikeudet, kieli) {
       $scope.muokkaustila = true;
 
       function setMuokkaustila(muokkaustila){
