@@ -89,7 +89,6 @@
                           :nimi_en nil
                           :selite_en nil
                           :kuvaus_en nil
-                          :ntm_kysymykset false
                           :voimassa_alkupvm nil
                           :voimassa_loppupvm nil})
 
