@@ -88,9 +88,7 @@
                           :kuvaus_sv nil
                           :nimi_en nil
                           :selite_en nil
-                          :kuvaus_en nil
-                          :voimassa_alkupvm nil
-                          :voimassa_loppupvm nil})
+                          :kuvaus_en nil})
 
 (defn lisaa-kysymysryhma! [kysymysryhma-data]
   (let [kysymysryhma  (merge tyhja-kysymysryhma (assoc kysymysryhma-data :kayttaja (:oid *kayttaja*)))

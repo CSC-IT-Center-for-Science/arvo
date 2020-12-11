@@ -1,6 +1,6 @@
 -- :name lisaa-kysymysryhma! <:!
-INSERT INTO kysymysryhma (taustakysymykset, valtakunnallinen, nimi_fi, nimi_sv, selite_fi, selite_sv, koulutustoimija, oppilaitos, luotu_kayttaja, muutettu_kayttaja, luotuaika, muutettuaika, tila, kuvaus_fi, kuvaus_sv, nimi_en, selite_en, kuvaus_en, voimassa_alkupvm, voimassa_loppupvm)
-VALUES (:taustakysymykset, :valtakunnallinen, :nimi_fi, :nimi_sv, :selite_fi, :selite_sv, :koulutustoimija, :oppilaitos, :kayttaja, :kayttaja, now(), now(), :tila, :kuvaus_fi, :kuvaus_sv, :nimi_en, :selite_en, :kuvaus_en, :voimassa_alkupvm, :voimassa_loppupvm)
+INSERT INTO kysymysryhma (taustakysymykset, valtakunnallinen, nimi_fi, nimi_sv, selite_fi, selite_sv, koulutustoimija, oppilaitos, luotu_kayttaja, muutettu_kayttaja, luotuaika, muutettuaika, tila, kuvaus_fi, kuvaus_sv, nimi_en, selite_en, kuvaus_en)
+VALUES (:taustakysymykset, :valtakunnallinen, :nimi_fi, :nimi_sv, :selite_fi, :selite_sv, :koulutustoimija, :oppilaitos, :kayttaja, :kayttaja, now(), now(), :tila, :kuvaus_fi, :kuvaus_sv, :nimi_en, :selite_en, :kuvaus_en)
 RETURNING kysymysryhmaid;
 
 -- :name paivita-kysymysryhma! :! :n
