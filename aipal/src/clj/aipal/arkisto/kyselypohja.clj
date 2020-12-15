@@ -14,7 +14,7 @@
 
 (ns aipal.arkisto.kyselypohja
   (:require [oph.korma.common :refer [select-unique select-unique-or-nil]]
-            [aipal.infra.kayttaja :refer [ntm-vastuukayttaja? yllapitaja? *kayttaja*]]
+            [aipal.infra.kayttaja :refer [yllapitaja? *kayttaja*]]
             [aipal.auditlog :as auditlog]
             [arvo.db.core :refer [*db*] :as db]
             [clojure.java.jdbc :as jdbc]
@@ -22,7 +22,7 @@
 
 (defn hae-kyselypohjat
   ([organisaatio vain-voimassaolevat]
-   (db/hae-kyselypohjat {:koulutustoimija organisaatio :voimassa vain-voimassaolevat}))
+   (db/hae-kyselypohjat {:koulutustoimija organisaatio :voimassa vain-voimassaolevat :valtakunnallinen true}))
   ([organisaatio]
    (hae-kyselypohjat organisaatio false)))
 

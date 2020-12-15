@@ -14,7 +14,7 @@
 
 (ns aipal.arkisto.kysely
   (:require [aipal.arkisto.kyselykerta :as kyselykerta]
-            [aipal.infra.kayttaja :refer [ntm-vastuukayttaja? yllapitaja? *kayttaja*]]
+            [aipal.infra.kayttaja :refer [yllapitaja? *kayttaja*]]
             [oph.common.util.util :refer [max-date]]
             [clojure.tools.logging :as log]
             [arvo.db.core :refer [*db*] :as db]
@@ -63,22 +63,18 @@
       kyselytyypit
       (filter #(not= (:id %) "move") kyselytyypit))))
 
-(defn lisaa-kysymys! [tx kyselyid kysymysid]
-  (db/lisaa-kysymys-kyselyyn! tx {:kyselyid kyselyid
-                                  :kysymysid kysymysid
-                                  :kayttaja (:oid *kayttaja*)}))
-
 (defn lisaa-kysymysryhma! [tx kyselyid kysymysryhma]
+  (db/lisaa-kyselyn-kysymysryhma! tx (merge kysymysryhma {:kyselyid kyselyid :kayttaja (:oid *kayttaja*)}))
   (let [kayttajan-kysymykset (map-by :kysymysid (:kysymykset kysymysryhma))]
-    (doseq [kysymys (hae-kysymysten-poistettavuus (:kysymysryhmaid kysymysryhma))
-            :let [kysymysid (:kysymysid kysymys)
-                  kayttajan-kysymys (get kayttajan-kysymykset kysymysid)]
-            :when (not (and (:poistettu kayttajan-kysymys)
-                            (:poistettava kysymys)))]
-      ;; Assertiin pitäisi törmätä vain jos käyttäjä on muokannut poistetuksi kysymyksen jota ei saisi poistaa
-      (assert (not (:poistettu kayttajan-kysymys)))
-      (lisaa-kysymys! tx kyselyid kysymysid)))
-  (db/lisaa-kyselyn-kysymysryhma! tx (merge kysymysryhma {:kyselyid kyselyid :kayttaja (:oid *kayttaja*)})))
+    (doseq [kysymys (hae-kysymysten-poistettavuus (:kysymysryhmaid kysymysryhma))]
+      (let [kysymysid (:kysymysid kysymys)
+            kayttajan-kysymys (get kayttajan-kysymykset kysymysid)
+            lisattavissa (not (and (:poistettu kayttajan-kysymys)
+                                   (:poistettava kysymys)))]
+        (assert (not (:poistettu kayttajan-kysymys)))
+        (when lisattavissa
+          (db/lisaa-kysymys-kyselyyn! tx {:kyselyid kyselyid :kysymysid kysymysid :kayttaja (:oid *kayttaja*)}))))))
+
 
 (defn format-kysely [kyselydata]
   (let [kategoria (merge (:kategoria kyselydata) {:esikatselu_tunniste (random-hash)})]
@@ -92,23 +88,23 @@
         (lisaa-kysymysryhma! tx kyselyid ryhma))
       (assoc kyselydata :kyselyid (:kyselyid kyselyid)))))
 
-(defn muokkaa-kyselya! [kyselydata]
-  (auditlog/kysely-muokkaus! (:kyselyid kyselydata))
-  (let [paivitettavat-kentat (if (= "julkaistu" (:tila kyselydata))
-                               [:selite_fi :selite_sv :selite_en :uudelleenohjaus_url]
-                               [:nimi_fi :nimi_sv :nimi_en :selite_fi :selite_sv :selite_en :voimassa_alkupvm :voimassa_loppupvm :tila :uudelleenohjaus_url :sivutettu :tyyppi])]
-    (log/info (assoc (select-keys kyselydata paivitettavat-kentat) :muutettu_kayttaja (:oid *kayttaja*)))
-    (jdbc/update! *db* :kysely
-                  (assoc (select-keys kyselydata paivitettavat-kentat) :muutettu_kayttaja (:oid *kayttaja*))
-                  ["kyselyid = ?" (:kyselyid kyselydata)])))
+;(defn muokkaa-kyselya! [kyselydata]
+;  (auditlog/kysely-muokkaus! (:kyselyid kyselydata))
+;  (let [paivitettavat-kentat (if (= "julkaistu" (:tila kyselydata))
+;                               [:selite_fi :selite_sv :selite_en :uudelleenohjaus_url]
+;                               [:nimi_fi :nimi_sv :nimi_en :selite_fi :selite_sv :selite_en :voimassa_alkupvm :voimassa_loppupvm :tila :uudelleenohjaus_url :sivutettu :tyyppi])]
+;    (log/info (assoc (select-keys kyselydata paivitettavat-kentat) :muutettu_kayttaja (:oid *kayttaja*)))
+;    (jdbc/update! *db* :kysely
+;                  (assoc (select-keys kyselydata paivitettavat-kentat) :muutettu_kayttaja (:oid *kayttaja*))
+;                  ["kyselyid = ?" (:kyselyid kyselydata)])))
 
 (defn paivita-kysely! [kyselydata]
   (let [kyselyid (:kyselyid kyselydata)
         current-data (hae kyselyid)
         updated-data (if (= "julkaistu" (:tila current-data))
-                       (select-keys current-data [:selite_fi :selite_sv :selite_en :uudelleenohjaus_url])
+                       (select-keys kyselydata [:selite_fi :selite_sv :selite_en :uudelleenohjaus_url])
                        kyselydata)
-        new-data (merge kysely-defaults updated-data {:kayttaja (:oid *kayttaja*)})]
+        new-data (merge current-data updated-data {:kayttaja (:oid *kayttaja*)})]
     (jdbc/with-db-transaction [tx *db*]
       (db/muokkaa-kyselya! new-data)
       ;TODO smarter way to update questions/groups

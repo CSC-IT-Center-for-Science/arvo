@@ -3,7 +3,7 @@ SELECT kp.kyselypohjaid, kp.nimi_fi, kp.nimi_sv, kp.nimi_en, kp.valtakunnallinen
 FROM kyselypohja kp
 WHERE kp.koulutustoimija = :koulutustoimija
 --~(if (:valtakunnallinen params) "OR kp.valtakunnallinen = :valtakunnallinen")
---~(if (:voimassa params) "AND kp.voimassa_alkupvm < now() AND (kp.voimassa_loppupvm > now() OR kp.voimassa_loppupvm IS NULL)")
+--~(if (:voimassa params) "AND (kp.voimassa_alkupvm IS NULL OR kp.voimassa_alkupvm < now()) AND (kp.voimassa_loppupvm > now() OR kp.voimassa_loppupvm IS NULL)")
 AND kp.tila = 'julkaistu' ORDER BY muutettuaika;
 
 -- :name hae-kyselypohja :? :1

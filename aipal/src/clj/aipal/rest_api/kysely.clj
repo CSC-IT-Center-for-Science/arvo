@@ -58,8 +58,7 @@
   (assert (not (> (lisakysymysten-lukumaara (:kysymysryhmat kysely)) max-kysymyksia)))
   (if (= "luonnos" (:tila kysely))
     (valmistele-luonnos-paivitys kysely)
-    (valmistele-julkaistu-paivitys kysely))
-  (arkisto/muokkaa-kyselya! kysely))
+    (valmistele-julkaistu-paivitys kysely)))
 
 (defn valid-url? "jäljittelee angular-puolen äärisimppeliä validointia"
   [url]

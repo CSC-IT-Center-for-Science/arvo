@@ -173,6 +173,9 @@ angular.module('kysely.kyselyui', ['rest.kysely', 'rest.kyselypohja',
             console.error('resp.data missing');
           }
           $scope.kyselytyypit = resp.data;
+          if($scope.kysely !== undefined){
+            $scope.kysely.tyyppi = _.find($scope.kyselytyypit, function(kt) {return kt.id === kysely.tyyppi});
+          }
         }).catch(function (e) {
         console.error(e);
       });
@@ -293,6 +296,9 @@ angular.module('kysely.kyselyui', ['rest.kysely', 'rest.kyselypohja',
             isJulkaistu: function() {
               return $scope.isJulkaistu();
             },
+            kyselytyyppi: function() {
+              return $scope.kysely.tyyppi.id;
+            }
           },
         });
         modalInstance.result.then(function (kysymysryhmaid) {
@@ -334,9 +340,10 @@ angular.module('kysely.kyselyui', ['rest.kysely', 'rest.kyselypohja',
     };
   }])
 
-  .controller('LisaaKysymysryhmaModalController', ['$uibModalInstance', '$scope', 'Kysymysryhma', 'isJulkaistu', function ($uibModalInstance, $scope, Kysymysryhma, isJulkaistu) {
+  .controller('LisaaKysymysryhmaModalController', ['$uibModalInstance', '$scope', 'Kysymysryhma', 'isJulkaistu', 'kyselytyyppi', function ($uibModalInstance, $scope, Kysymysryhma, isJulkaistu, kyselytyyppi) {
     $scope.outerscope = {};
     $scope.isJulkaistu = isJulkaistu;
+    $scope.kyselytyyppi = kyselytyyppi;
 
     Kysymysryhma.haeVoimassaolevat().then(function(resp){
       if (!resp.data) {
@@ -344,7 +351,13 @@ angular.module('kysely.kyselyui', ['rest.kysely', 'rest.kyselypohja',
       }
       const kysymysryhmat = resp.data;
       $scope.kysymysryhmat = _.filter(kysymysryhmat, function(kr) {
-        return !kr.valtakunnallinen;
+        if(kr.kategoria !== null && kr.kategoria.lisattavissa_kyselyyn === kyselytyyppi){
+          console.log("kategoria not null: " + JSON.stringify(kr.kategoria));
+          console.log("lisattavissa: " + JSON.stringify(kr.kategoria.lisattavissa_kyselyyn));
+          console.log(JSON.stringify(kr.kategoria.lisattavissa_kyselyyn) +  " === " + JSON.stringify(kyselytyyppi) + " : " + JSON.stringify(kr.kategoria.lisattavissa_kyselyyn === kyselytyyppi));
+          return kr.kategoria.lisattavissa_kyselyyn === kyselytyyppi;
+        }
+        else return !kr.valtakunnallinen;
       });
     }).catch(function (e) {
       console.error(e);

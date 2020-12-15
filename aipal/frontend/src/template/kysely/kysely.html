@@ -98,11 +98,11 @@
     <div class="row"><br /></div>
 
     <div>
-        <button class="btn btn-primary" ng-click="lisaaKyselypohjaModal()" ng-if="!isJulkaistu()">
+        <button class="btn btn-primary" ng-click="lisaaKyselypohjaModal()" ng-if="!isJulkaistu()" ng-disabled="kysely.tyyppi === null || kysely.tyyppi === undefined">
             {{i18n.kysely.lisaa_kyselypohja}}&nbsp;
             <span class="fa fa-plus"></span>
         </button>
-        <button class="btn btn-primary e2e-lisaa-kysymysryhma" ng-click="lisaaKysymysryhmaModal(isJulkaistu())">
+        <button class="btn btn-primary e2e-lisaa-kysymysryhma" ng-click="lisaaKysymysryhmaModal(isJulkaistu())" ng-disabled="kysely.tyyppi === null || kysely.tyyppi === undefined">
             {{i18n.kysely.lisaa_kysymysryhma}}&nbsp;
             <span class="fa fa-plus"></span>
         </button>
