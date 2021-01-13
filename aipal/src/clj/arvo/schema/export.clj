@@ -154,6 +154,13 @@
   {:vastaajatunnus s/Str
    :opiskeluoikeus s/Str})
 
+(s/defschema Monivalintavaihtoehto
+  {:kysymysid s/Int
+   :jarjestys s/Int
+   :teksti_fi (s/maybe s/Str)
+   :teksti_sv (s/maybe s/Str)
+   :teksti_en(s/maybe s/Str)})
+
 (s/defschema Luodut-tunnukset
   {:kyselykertaid s/Int
    :oppilaitoskoodi (s/maybe s/Str)
