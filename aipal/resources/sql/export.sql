@@ -35,7 +35,7 @@ WHERE k.tila != 'luonnos'
   AND coalesce((kk.metatiedot->>'ei_raportoida')::BOOLEAN, FALSE ) = FALSE
 --~(if (:alkupvm params) "AND v.vastausaika >= :alkupvm::date")
 --~(if (:loppupvm params) "AND v.vastausaika <= :loppupvm::date")
--- (if (:kyselyid params) "AND kys.kyselyid = :kyselyid")
+--~(if (:kyselyid params) "AND k.kyselyid = :kyselyid")
 --~(if (:vipunen params) "AND kys.valtakunnallinen = TRUE" "AND k.koulutustoimija = :koulutustoimija")
 --~(if (:vipunen params) "AND kys.vastaustyyppi != 'vapaateksti'")
 --~(if (:since params) "AND v.vastausid > :since")
@@ -55,13 +55,13 @@ JOIN kysely kys ON kkr.kyselyid = kys.kyselyid
 -- TODO: Vapaatekstien ja omien kysymysten rajaus pois tarvittaessa (vipunen)
 WHERE kr.tila != 'luonnos'
 AND kys.tyyppi IN (:v*:kyselytyypit)
-AND (kys.koulutustoimija = :koulutustoimija
 --~(if (:kyselyid params) "AND kys.kyselyid = :kyselyid")
+AND (kys.koulutustoimija = :koulutustoimija
 --~(if (:vipunen params) "OR k.valtakunnallinen = TRUE")
 );
 
 -- :name export-taustatiedot :? :*
-SELECT v.vastaajaid,vt.vastaajatunnusid, vt.tunnus AS vastaajatunnus,
+SELECT v.vastaajaid,vt.vastaajatunnusid, kk.kyselykertaid, vt.tunnus AS vastaajatunnus,
   to_char(vt.voimassa_alkupvm, 'YYYY-MM-DD') AS vastaajatunnus_alkupvm,
   to_char(vt.voimassa_loppupvm, 'YYYY-MM-DD') AS vastaajatunnus_loppupvm,
   vt.valmistavan_koulutuksen_oppilaitos AS oppilaitos, vt.suorituskieli,

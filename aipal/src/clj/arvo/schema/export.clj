@@ -138,6 +138,7 @@
 (s/defschema Vastaajatunnus
   {:vastaajaid       s/Int
    :vastaajatunnusid s/Int
+   :kyselykertaid    s/Int
    :vastaajatunnus   s/Str
    :oppilaitos       (s/maybe s/Str)
    :taustatiedot     (s/maybe Taustatiedot)
