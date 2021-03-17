@@ -23,7 +23,7 @@
 
 (defn vastauslinkki-response [luotu-tunnus request-id]
   (if (:tunnus luotu-tunnus)
-    (api-response {:kysely_linkki (str (:vastaus-base-url @asetukset)"/"(:tunnus luotu-tunnus))
+    (api-response {:kysely_linkki (str (:vastaus-base-url @asetukset)"/v/"(:tunnus luotu-tunnus))
                    :voimassa_loppupvm (f/unparse (f/formatters :date)(:voimassa_loppupvm luotu-tunnus))})
     (handle-error (:error luotu-tunnus) request-id)))
 

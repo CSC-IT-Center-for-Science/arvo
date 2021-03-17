@@ -126,7 +126,7 @@
                 <tr ng-repeat="tunnus in tunnukset"
                     ng-class="{lukittu: tunnus.lukittu, voimassa: tunnus.kaytettavissa && tunnus.kohteiden_lkm > tunnus.vastausten_lkm}"
                     ts-repeat>
-                    <td class="e2e-vastaajatunnus-url">{{vastausBaseUrl}}/{{tunnus.tunnus}}</td>
+                    <td class="e2e-vastaajatunnus-url">{{vastausBaseUrl}}/v/{{tunnus.tunnus}}</td>
                     <td>{{tunnus.luotuaika | date:'dd.MM.yyyy hh:mm:ss'}}</td>
                     <td>{{tunnus.voimassa_alkupvm | voimassaoloAika: tunnus.voimassa_loppupvm}}</td>
                     <td>
@@ -160,7 +160,7 @@
                                     <span class="fa fa-unlock"></span>
                                 </a>
                                 &nbsp;
-                                <a href="mailto:?subject={{i18n.vastaajatunnus.vastaa}}: {{ kysely | lokalisoiKentta:'nimi' }}&body={{vastausBaseUrl}}/{{tunnus.tunnus}}"
+                                <a href="mailto:?subject={{i18n.vastaajatunnus.vastaa}}: {{ kysely | lokalisoiKentta:'nimi' }}&body={{vastausBaseUrl}}/v/{{tunnus.tunnus}}"
                                    title="{{i18n.vastaajatunnus.laheta}}">
                                     <span class="fa fa-envelope"></span>
                                 </a>
