@@ -64,7 +64,7 @@
                                                       :development-mode (pr-str (:development-mode asetukset))
                                                       :ominaisuus (cheshire/generate-string (:ominaisuus asetukset))}
                                                      (when-let [cas-url (-> asetukset :cas-auth-server :url)]
-                                                       {:logout-url (str cas-url "/logout")})))}))
+                                                       {:logout-url (str cas-url "/logout")})))})
     (context "/api/jslog" [] :no-doc true :middleware [wrap-tarkasta-csrf-token] aipal.rest_api.js-log/reitit)
     (context "/api/i18n" [] :no-doc true aipal.rest-api.i18n/reitit)
     (context "/api/kyselykerta" [] :no-doc true :tags ["kyselykerta"] :middleware [wrap-tarkasta-csrf-token] aipal.rest-api.kyselykerta/reitit)
@@ -93,5 +93,6 @@
     (context "/api/public/luovastaajatunnus" [] :no-doc true :tags ["vastaajatunnus"] :middleware [#(wrap-authentication :kyselyynohjaus %)] arvo.rest-api.automaattitunnus/kyselyynohjaus-v1)
     (context "/api/public/henkilo" [] :no-doc true :tags ["henkilooidit"] :middleware [#(wrap-authentication :kyselyynohjaus %)] arvo.rest-api.henkilo/hae-kaikki-oidit)
     (context "/api/vastauslinkki/v1" [] :tags ["vastauslinkki"] :middleware [#(wrap-authentication :ehoks_tunnukset %)] arvo.rest-api.automaattitunnus/ehoks-v1)
+    (context "/api/tyoelamapalaute/v1" [] :tags ["tyoelamapalaute"] :middleware [#(wrap-authentication :ehoks_tunnukset %)] arvo.rest-api.automaattitunnus/tyoelamapalaute-v1)
     (context "/api/admin" [] :no-doc true :tags ["admin"] :middleware [#(wrap-authentication :admin %)] arvo.rest-api.admin/admin-routes)
-    (r/not-found "Not found")))
+    (r/not-found "Not found"))))
