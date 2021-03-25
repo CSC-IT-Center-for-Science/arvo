@@ -34,9 +34,11 @@
    :request_id                                s/Str})
 
 (s/defschema Nippulinkki
-  {:koulutustoimija_oid s/Str
+  {:tunniste            s/Str
+   :koulutustoimija_oid s/Str
    :oppilaitos_oid      s/Str
-   :tunniste            s/Str
+   :tuntkintotunnus     s/Str
+   :tutkinnon_osa       (s/maybe s/Str)
    :tunnukset           [s/Str]
    :voimassa_alkupvm    s/Str
    :request_id          s/Str})

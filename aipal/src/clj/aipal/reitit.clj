@@ -51,20 +51,20 @@
                        Glossary: https://wiki.eduuni.fi/display/CscArvo/Glossary"}
                 :basePath (str (service-path (get-in asetukset [:server :base-url] "/api")))
                 :tags [{:name "export" :description "Kyselytietojen siirtorajapinta"}]}})
-   (context "" [] :no-doc true
-            (GET "/" [] {:status 200
-                         :headers {"Content-type" "text/html; charset=utf-8"
-                                   "Set-cookie" (aseta-csrf-token (-> asetukset :server :base-url service-path))}
-                         :body (s/render-file "public/app/index.html"
-                                              (merge {:base-url (-> asetukset :server :base-url)
-                                                      :vastaus-base-url (-> asetukset :vastaus-base-url)
-                                                      :current-user (:nimi *kayttaja*)
-                                                      :build-id @build-id
-                                                      :project-version @project-version
-                                                      :development-mode (pr-str (:development-mode asetukset))
-                                                      :ominaisuus (cheshire/generate-string (:ominaisuus asetukset))}
+    (context "" [] :no-doc true
+             (GET "/" [] {:status 200
+                          :headers {"Content-type" "text/html; charset=utf-8"
+                                    "Set-cookie" (aseta-csrf-token (-> asetukset :server :base-url service-path))}
+                          :body (s/render-file "public/app/index.html"
+                                               (merge {:base-url (-> asetukset :server :base-url)
+                                                       :vastaus-base-url (-> asetukset :vastaus-base-url)
+                                                       :current-user (:nimi *kayttaja*)
+                                                       :build-id @build-id
+                                                       :project-version @project-version
+                                                       :development-mode (pr-str (:development-mode asetukset))
+                                                       :ominaisuus (cheshire/generate-string (:ominaisuus asetukset))}
                                                      (when-let [cas-url (-> asetukset :cas-auth-server :url)]
-                                                       {:logout-url (str cas-url "/logout")})))})
+                                                       {:logout-url (str cas-url "/logout")})))}))
     (context "/api/jslog" [] :no-doc true :middleware [wrap-tarkasta-csrf-token] aipal.rest_api.js-log/reitit)
     (context "/api/i18n" [] :no-doc true aipal.rest-api.i18n/reitit)
     (context "/api/kyselykerta" [] :no-doc true :tags ["kyselykerta"] :middleware [wrap-tarkasta-csrf-token] aipal.rest-api.kyselykerta/reitit)
@@ -95,4 +95,4 @@
     (context "/api/vastauslinkki/v1" [] :tags ["vastauslinkki"] :middleware [#(wrap-authentication :ehoks_tunnukset %)] arvo.rest-api.automaattitunnus/ehoks-v1)
     (context "/api/tyoelamapalaute/v1" [] :tags ["tyoelamapalaute"] :middleware [#(wrap-authentication :ehoks_tunnukset %)] arvo.rest-api.automaattitunnus/tyoelamapalaute-v1)
     (context "/api/admin" [] :no-doc true :tags ["admin"] :middleware [#(wrap-authentication :admin %)] arvo.rest-api.admin/admin-routes)
-    (r/not-found "Not found"))))
+    (r/not-found "Not found")))

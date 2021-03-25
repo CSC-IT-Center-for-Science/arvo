@@ -96,7 +96,9 @@
         oppilaitos (db/hae-oidilla {:taulu "oppilaitos" :oid (:oppilaitos_oid data)})
         kyselyid (:kyselyid (kyselykerta/hae-automaatti-kyselykerta koulutustoimija "tyoelamapalaute" nil))
         alkupvm (f/parse (f/formatters :date) (:voimassa_alkupvm data))
-        taustatiedot {:oppilaitos (:oppilaitoskoodi oppilaitos)}]
+        taustatiedot {:oppilaitos (:oppilaitoskoodi oppilaitos)
+                      :tutkinto (:tutkintotunnus data)
+                      :tutkinnon_osa (:tutkinnon_osa data)}]
     (merge data {:kyselyid kyselyid :taustatiedot taustatiedot}
                 (tunnus-voimassaolo :tyoelamapalaute alkupvm))))
 
