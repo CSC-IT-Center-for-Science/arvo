@@ -56,7 +56,7 @@ WHERE EXISTS (SELECT 1 FROM kysely k WHERE k.koulutustoimija = kt.ytunnus AND k.
     );
 
 -- :name hae-ammatilliset-koulutustoimijat :?
-SELECT DISTINCT koulutustoimija FROM koulutustoimija_ja_tutkinto ktt
+SELECT DISTINCT kt.ytunnus FROM koulutustoimija_ja_tutkinto ktt
 JOIN koulutustoimija kt on ktt.koulutustoimija = kt.ytunnus
 WHERE kt.lakkautuspaiva is NULL
   AND NOT EXISTS (
