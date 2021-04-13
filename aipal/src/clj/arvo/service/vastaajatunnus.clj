@@ -68,6 +68,7 @@
                                 :toimipaikka (:toimipaikkakoodi (db/hae-oidilla {:taulu "toimipaikka" :oid (:toimipiste_oid data)}))
                                 :valmistavan_koulutuksen_oppilaitos (:oppilaitoskoodi (db/hae-oidilla {:taulu "oppilaitos" :oid (:oppilaitos_oid data)}))
                                 :tutkinto (:tutkintotunnus data)
+                                :osaamisala (:osaamisala data)
                                 :hankintakoulutuksen_toteuttaja (:ytunnus (db/hae-oidilla {:taulu "koulutustoimija":oid (:hankintakoulutuksen_toteuttaja data)}))
                                 :tarkenne (:kyselyn_tyyppi data)
                                 :metatiedot (:metatiedot data)})))
@@ -84,7 +85,9 @@
                                 :kieli "fi"
                                 ;Työelämäpalaute
                                 :tyonantaja (:tyonantaja data)
+                                :tyopaikka (:tyopaikka data)
                                 :tutkinnon_osa (:tutkinnon_osa data)
+                                :paikallinen_tutkinnon_osa (:paikallinen_tutkinnon_osa data)
                                 :tyopaikkajakson_alkupvm (:tyopaikkajakson_alkupvm data)
                                 :tyopaikkajakson_loppupvm (:tyopaikkajakson_loppupvm data)
                                 :sopimustyyppi (:sopimustyyppi data)
@@ -121,10 +124,26 @@
   (let [tunnus (rekry-tunnus data)]
     (vastaajatunnus/lisaa-automaattitunnus! tunnus)))
 
+(defn validoi-taustatieto [nippu taustatieto tunnukset]
+  (if (every? #(= (taustatieto nippu) (get-in % taustatieto)) tunnukset)
+    {:valid true}
+    {:valid false :error (str "inconsistent info: " taustatieto)}))
+
+(defn validoi-nippu [nippu tunnukset]
+  (cons (if (= (count tunnukset) (count (:tunnukset nippu)))
+          {:valid true} {:valid false :error "invalid-tunnukset"})
+    ((juxt
+       #(validoi-taustatieto nippu [:koulutustoimija] %)
+       #(validoi-taustatieto nippu [:taustatiedot :tutkinto] %))
+     tunnukset)))
+
 (defn niputa-tunnukset! [data]
-  (let [nippu (nippu data)]
-    (vastaajatunnus/niputa-tunnukset nippu)
-    nippu))
+  (let [nippu (nippu data)
+        tunnukset (db/hae-tunnukset data)
+        validation-result (validoi-nippu nippu tunnukset)]
+    (if (every? :valid validation-result)
+      (vastaajatunnus/niputa-tunnukset nippu)
+      validation-result)))
 
 (defn paivita-metatiedot [tunnus paivitettavat-metatiedot]
   (let [paivitettava-vastaajatunnus {:metatiedot paivitettavat-metatiedot
