@@ -173,7 +173,7 @@
             </tbody>
         </table>
             <table class="table table-striped vastaajatunnus-taulukko" ts-wrapper
-                   ng-if="(kysely.tyyppi = 'tyoelamapalaute') ">
+                   ng-if="(kysely.tyyppi === 'tyoelamapalaute') ">
                 <thead>
                 <tr>
                     <th ts-criteria="tunnus">{{'i18n.vastaajatunnus.nippulinkki'|i18n}}</th>
