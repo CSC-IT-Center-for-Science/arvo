@@ -211,3 +211,8 @@
 
 (defn hae-niput [kyselykertaid]
   (map taydenna-nippu (db/hae-kyselykerran-niput {:kyselykertaid kyselykertaid})))
+
+(defn poista-nippu [tunniste]
+  (jdbc/with-db-transaction [tx *db*]
+    (do (db/poista-tunnukset-nipusta! {:tunniste tunniste})
+        (db/poista-nippu! {:tunniste tunniste}))))
