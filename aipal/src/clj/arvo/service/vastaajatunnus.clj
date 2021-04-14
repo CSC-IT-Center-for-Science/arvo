@@ -102,13 +102,14 @@
         taustatiedot {:oppilaitos (:oppilaitoskoodi oppilaitos)
                       :tutkinto (:tutkintotunnus data)
                       :tutkinnon_osa (:tutkinnon_osa data)}]
-    (merge data {:kyselyid kyselyid :taustatiedot taustatiedot}
+    (merge data {:kyselyid kyselyid :taustatiedot taustatiedot :koulutustoimija koulutustoimija}
                 (tunnus-voimassaolo :tyoelamapalaute alkupvm))))
 
 (defn lisaa-tyoelamapalaute-tunnus! [data]
   (log/info "Luodaan työelämäpalautteen tunnus, id:" (:request_id data))
   (let [tunnus (tyoelamapalaute-tunnus data)]
-    (vastaajatunnus/lisaa-automaattitunnus! tunnus)))
+    (try
+      (vastaajatunnus/lisaa-automaattitunnus! tunnus))))
 
 (defn lisaa-amispalaute-tunnus! [data]
   (log/info "Luodaan automaattitunnus, request-id:" (:request_id data))
@@ -125,7 +126,7 @@
     (vastaajatunnus/lisaa-automaattitunnus! tunnus)))
 
 (defn validoi-taustatieto [nippu taustatieto tunnukset]
-  (if (every? #(= (taustatieto nippu) (get-in % taustatieto)) tunnukset)
+  (if (every? #(= (get-in nippu taustatieto) (get-in % taustatieto)) tunnukset)
     {:valid true}
     {:valid false :error (str "inconsistent info: " taustatieto)}))
 
@@ -143,7 +144,15 @@
         validation-result (validoi-nippu nippu tunnukset)]
     (if (every? :valid validation-result)
       (vastaajatunnus/niputa-tunnukset nippu)
-      validation-result)))
+      {:errors (->> validation-result
+                    (filter #(not (:valid %)))
+                    (map :error))})))
+
+(defn poista-nippu [tunniste]
+  (let [tunnukset (db/hae-nipun-tunnukset {:tunniste tunniste})]
+    (if (not-any? :vastattu tunnukset)
+      (vastaajatunnus/poista-nippu tunniste)
+      {:error "Nipussa on jo vastauksia"})))
 
 (defn paivita-metatiedot [tunnus paivitettavat-metatiedot]
   (let [paivitettava-vastaajatunnus {:metatiedot paivitettavat-metatiedot
