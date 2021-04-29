@@ -26,7 +26,8 @@
                                 :vastausten_lkm "Vastaajien lkm" :vastaajien_lkm "Vastaajien lkm" :kohteiden_lkm "Kohteiden lkm"
                                 :tutkinto_selite "Tutkinnon nimi"
                                 :hankintakoulutuksen_toteuttaja_selite "Hankintakoulutuksen toteuttajan nimi"
-                                :toimipaikka_selite "Toimipaikan nimi"
+                                :toimipiste_selite "Toimipisteen nimi"
+                                :koulutustoimija_selite "Koulutustoimijan nimi"
                                 :koulutusalakoodi_selite "Koulutusala"
                                 :asuinkunta_koodi_selite "Asuinkunta selite"
                                 :opiskelupaikkakunta_koodi_selite "Opiskelupaikkakunta selite"
@@ -44,7 +45,8 @@
                                 :vastausten_lkm "Respondents antal" :vastaajien_lkm "Respondents antal" :kohteiden_lkm "Svarsantal"
                                 :tutkinto_selite "Namn på examen"
                                 :hankintakoulutuksen_toteuttaja_selite "Namn på anordnaren av anskaffad utbildning"
-                                :toimipaikka_selite "Namn på verksamhetsställe"
+                                :toimipiste_selite "Namn på verksamhetsställe"
+                                :koulutustoimija_selite "Namn på utbildningsaktör"
                                 :koulutusalakoodi_selite "Utbildningsområde"
                                 :asuinkunta_koodi_selite "Bostadskommun"
                                 :opiskelupaikkakunta_koodi_selite "Field of education"
@@ -61,7 +63,8 @@
                                 :vastausten_lkm "RespondentCount" :vastaajien_lkm "RespondentCount" :kohteiden_lkm "ResponseCount"
                                 :tutkinto_selite "Name of degree"
                                 :hankintakoulutuksen_toteuttaja_selite "Name of provider (procured training)"
-                                :toimipaikka_selite "Name of operational unit"
+                                :toimipiste_selite "Name of operational unit"
+                                :koulutustoimija_selite "TODO"
                                 :koulutusalakoodi_selite "Field of education"
                                 :asuinkunta_koodi_selite "Municipality of residence"
                                 :opiskelupaikkakunta_koodi_selite "Municipality of education"
@@ -235,7 +238,10 @@
                (first (filter #(= (:toimipaikka data) (:toimipaikkakoodi %)) (:toimipaikat selitteet)))))
       (assoc :hankintakoulutuksen_toteuttaja_selite
              (translate-field "nimi" lang
-               (first (filter #(= (:hankintakoulutuksen_toteuttaja data) (:ytunnus %)) (:koulutustoimijat selitteet)))))
+               (first (filter #(= (:hankintakoulutuksen_toteuttaja data) (:ytunnus %)) (:hankintakoulutuksen-toteuttajat selitteet)))))
+      (assoc :koulutustoimija_selite
+             (translate-field "nimi" lang
+                              (first (filter #(= (:koulutustoimija data) (:ytunnus %)) (:koulutustoimijat selitteet)))))
       (assoc :koulutusalakoodi_selite
              (translate-field "nimi" lang
                (first (filter #(= (:koulutusalakoodi data) (:koulutusalatunnus %)) (:koulutusalat selitteet)))))
@@ -279,6 +285,7 @@
 (defn hae-selitteet [kyselyid]
   {:tutkinnot (db/hae-kyselyn-tutkinnot {:kyselyid kyselyid})
    :toimipaikat (db/hae-kyselyn-toimipaikat {:kyselyid kyselyid})
+   :hankintakoulutuksen-toteuttajat (db/hae-kyselyn-hankintakoulutuksen-toteuttajat {:kyselyid kyselyid})
    :koulutustoimijat (db/hae-kyselyn-koulutustoimijat {:kyselyid kyselyid})
    :koulutusalat (db/hae-kyselyn-koulutusalat {:kyselyid kyselyid})
    :kunnat (hae-kunnat (:koodistopalvelu @asetukset))})
