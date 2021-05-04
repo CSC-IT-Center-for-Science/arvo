@@ -178,10 +178,10 @@
                    ng-if="(kysely.tyyppi === 'tyoelamapalaute') ">
                 <thead>
                 <tr>
-                    <th ts-criteria="tunnus">{{'i18n.vastaajatunnus.nippulinkki'|i18n}}</th>
+                    <th ts-criteria="tunniste">{{'i18n.vastaajatunnus.nippulinkki'|i18n}}</th>
                     <th ts-criteria="voimassa_alkupvm">{{'kyselykerta.vastausaika' | i18n}}</th>
-                    <th ts-criteria="tyonantaja">{{'vastaajatunnus.tyopaikka' | i18n}}</th>
-                    <th ts-criteria="tutkinto|lokalisoiKentta:'nimi'">{{'i18n.vastaajatunnus.tutkinto'|i18n}}</th>
+                    <th ts-criteria="taustatiedot.tyonantaja">{{'vastaajatunnus.tyopaikka' | i18n}}</th>
+                    <th ts-criteria="taustatiedot.tutkinto|lokalisoiKentta:'nimi'">{{'i18n.vastaajatunnus.tutkinto'|i18n}}</th>
                     <th ts-criteria="vastausten_lkm">{{'i18n.vastaajatunnus.vastauksia'|i18n}}</th>
                     <th></th>
                 </tr>
