@@ -5,13 +5,13 @@
             [oph.common.infra.i18n :as i18n]
             [oph.common.infra.common-audit-log-test :as common-audit-log-test]
             [aipal.palvelin :as palvelin]
-            [aipal.asetukset :refer [hae-asetukset oletusasetukset]]
             [aipal.integraatio.sql.korma :as korma]
             [aipal.infra.kayttaja.vaihto :refer [with-kayttaja]]
             [aipal.infra.kayttaja.vakiot :refer [default-test-user-uid]]
             [aipal.sql.test-util :refer :all]
             [aipal.sql.test-data-util :refer :all]
-            [buddy.sign.jws :as jws]))
+            [buddy.sign.jws :as jws]
+            [arvo.config :refer [env]]))
 
 (defn with-auth-user [f]
   (with-kayttaja default-test-user-uid nil nil
@@ -61,7 +61,7 @@
 
 ;;TODO : Remove xsrf-token from here
 (defn session-no-token []
-  (let [asetukset (-> oletusasetukset
+  (let [asetukset (-> env
                     (assoc-in [:cas-auth-server :enabled] false)
                     (assoc :development-mode true))]
     (alusta-korma! asetukset)

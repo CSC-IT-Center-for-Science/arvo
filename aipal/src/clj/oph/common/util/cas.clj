@@ -2,7 +2,7 @@
   (:require [clj-http.client :as http]
             [again.core :as again]
             [clojure.tools.logging :as log]
-            [aipal.asetukset :refer [asetukset]]
+            [arvo.config :refer [env]]
             [oph.common.util.util :refer [oletus-header]]))
 
 (def kirjautumistila
@@ -44,10 +44,10 @@
                     (-> state ::again/user-context deref :palvelu)
                     (:cause (Throwable->map (::again/exception state)))))
   (let [{cas-url :url
-         unsafe-https :unsafe-https} (:cas-auth-server @asetukset)
+         unsafe-https :unsafe-https} (:cas-auth-server env)
         {palvelu-url :url
          user :user
-         password :password} (get @asetukset (-> state ::again/user-context deref :palvelu))
+         password :password} (get env (-> state ::again/user-context deref :palvelu))
         prequel-url (format "%s/cas/prequel" palvelu-url)
         yritetty-uudestaan? (< 1 (::again/attempts state))
         status (:status (:data (Throwable->map (::again/exception state))))
@@ -62,7 +62,7 @@
 
 (defn request-with-cas-auth [palvelu options]
   (log/info "Pyyntö palveluun" palvelu "asetuksilla" options)
-  (let [{cas-enabled :enabled} (:cas-auth-server @asetukset)]
+  (let [{cas-enabled :enabled} (:cas-auth-server env)]
     (if cas-enabled
       (again/with-retries
        {::again/callback     tiketit-uusiva-kirjautuminen
