@@ -121,7 +121,6 @@
     :summary "Yksittäisen vastaajatunnuksen luominen"
     (let [luotu-tunnus (vt/lisaa-tyoelamapalaute-tunnus! data)]
       (vastaajatunnus-response luotu-tunnus (:request-id data))))
-
   (DELETE "/vastaajatunnus/:tunnus" []
     :path-params [tunnus :- s/Str]
     :responses {status/ok {:schema s/Str :description "Tunnus poistettu"}
