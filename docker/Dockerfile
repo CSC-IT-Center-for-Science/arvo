@@ -15,6 +15,7 @@ WORKDIR /opt/arvo-build/frontend
 RUN npm config set user 0
 RUN npm config set unsafe-perm true
 RUN npm install
+RUN npm rebuild node-sass
 RUN grunt build
 # Build backend
 WORKDIR /opt/arvo-build
