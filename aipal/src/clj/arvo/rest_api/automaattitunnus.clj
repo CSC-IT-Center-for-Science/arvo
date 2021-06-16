@@ -149,7 +149,7 @@
           rivia-paivitetty (vt/paivita-nipun-metatiedot tunniste metatiedot)]
       (if (not= rivia-paivitetty 0)
         (api-response paivitettavat-metatiedot)
-        (response/not-found "Ei vastaajatunnusta integraatiokäyttäjälle"))))
+        (response/not-found "Ei nippua integraatiokäyttäjälle"))))
 
   (DELETE "/nippu/:tunniste" []
     :path-params [tunniste :- s/Str]
