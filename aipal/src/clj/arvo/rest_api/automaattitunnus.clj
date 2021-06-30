@@ -23,8 +23,9 @@
 
 (defn vastauslinkki-response [luotu-tunnus request-id]
   (if (:tunnus luotu-tunnus)
-    (api-response {:kysely_linkki (str (:vastaus-base-url env)"/"(:tunnus luotu-tunnus))
-                   :voimassa_loppupvm (f/unparse (f/formatters :date)(:voimassa_loppupvm luotu-tunnus))})
+    (api-response {:kysely_linkki (str (:vastaus-base-url env)"/v/"(:tunnus luotu-tunnus))
+                   :voimassa_loppupvm (f/unparse (f/formatters :date)(:voimassa_loppupvm luotu-tunnus))
+                   :tunnus (:tunnus luotu-tunnus)})
     (handle-error (:error luotu-tunnus) request-id)))
 
 (defn vastaajatunnus-response [luotu-tunnus request-id]
@@ -80,8 +81,8 @@
 (defroutes ehoks-v1
   (POST "/" []
     :body [data Amispalaute-tunnus]
-    :responses {status/ok {:schema {:kysely_linkki s/Str :voimassa_loppupvm org.joda.time.DateTime}}
-                status/not-found {:schema {:ei-kyselykertaa s/Any} :description "Kyselykertaa ei ole olemassa"}}
+    :responses {status/ok {:schema {:kysely_linkki s/Str :voimassa_loppupvm org.joda.time.DateTime :tunnus s/Str}}
+                status/not-found {:schema {:error s/Str :msg s/Str} :description "Kyselykertaa ei ole olemassa"}}
     :summary "Kyselylinkin luominen"
     :description (str "Päivämäärät ovat ISO-formaatin mukaisia. Suorituskieli on fi, sv tai en. Tutkintotunnus
         on opintopolun koulutus koodiston 6 numeroinen koodi.")
@@ -120,6 +121,7 @@
     :summary "Yksittäisen vastaajatunnuksen luominen"
     (let [luotu-tunnus (vt/lisaa-tyoelamapalaute-tunnus! data)]
       (vastaajatunnus-response luotu-tunnus (:request-id data))))
+
   (DELETE "/vastaajatunnus/:tunnus" []
     :path-params [tunnus :- s/Str]
     :responses {status/ok {:schema s/Str :description "Tunnus poistettu"}
@@ -138,6 +140,17 @@
         (do
           (log/info "Virhe nipun luonnissa: " (:errors nippu) "data:" data)
           (response/not-found {:errors (:errors nippu)})))))
+
+  (PATCH "/nippu/:tunniste/metatiedot" []
+    :path-params [tunniste :- s/Str]
+    :body [metatiedot Vastaajatunnus-metatiedot]
+    :summary "Nipun metatietojen päivitys"
+    (let [paivitettavat-metatiedot (select-keys metatiedot sallitut-metatiedot)
+          rivia-paivitetty (vt/paivita-nipun-metatiedot tunniste metatiedot)]
+      (if (not= rivia-paivitetty 0)
+        (api-response paivitettavat-metatiedot)
+        (response/not-found "Ei nippua integraatiokäyttäjälle"))))
+
   (DELETE "/nippu/:tunniste" []
     :path-params [tunniste :- s/Str]
     :summary "Poista nippu"

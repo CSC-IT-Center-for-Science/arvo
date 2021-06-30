@@ -332,7 +332,7 @@
     (csv-response kyselyid lang (create-csv (cons header vastausrivit)))))
 
 (defn vastaajatunnus-url [tunnus]
-  (str (:vastaus-base-url env) "/" (:tunnus tunnus)))
+  (str (:vastaus-base-url env) "/v/" (:tunnus tunnus)))
 
 (defn create-header-row-single [taustatieto-fields translations]
   (concat (map #(get translations %) taustatieto-fields)

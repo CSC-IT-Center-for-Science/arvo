@@ -281,7 +281,7 @@ angular.module('kyselykerta.kyselykertaui', ['yhteiset.palvelut.i18n', 'ui.boots
         });
 
         modalInstance.result.then(function(kohteiden_lkm) {
-          Vastaajatunnus.muokkaaVastaajienLukumaaraa($scope.kyselykertaid, tunnus.vastaajatunnusid, kohteiden_lkm).then(function() {
+          Vastaajatunnus.muokkaaVastaajienLukumaaraa($scope.kyselykertaid, tunnus.tunnus, kohteiden_lkm).then(function() {
             tunnus.kohteiden_lkm = kohteiden_lkm;
           }).catch(function (e) {
             console.error(e);
@@ -293,7 +293,7 @@ angular.module('kyselykerta.kyselykertaui', ['yhteiset.palvelut.i18n', 'ui.boots
 
       $scope.poistaTunnus = function(tunnus) {
         varmistus.varmista(i18n.hae('vastaajatunnus.poista_otsikko'), null, i18n.hae('vastaajatunnus.poista_teksti'), i18n.hae('yleiset.poista')).then(function() {
-          Vastaajatunnus.poista($scope.kyselykertaid, tunnus.vastaajatunnusid).then(function() {
+          Vastaajatunnus.poista($scope.kyselykertaid, tunnus.tunnus).then(function() {
             $scope.tunnukset = _.reject($scope.tunnukset, function(t) { return t.vastaajatunnusid === tunnus.vastaajatunnusid; });
           }).catch(function (e) {
             console.error(e);
@@ -304,7 +304,7 @@ angular.module('kyselykerta.kyselykertaui', ['yhteiset.palvelut.i18n', 'ui.boots
       };
 
       $scope.lukitseTunnus = function(tunnus, lukitse) {
-        Vastaajatunnus.lukitse($routeParams.kyselykertaid, tunnus.vastaajatunnusid, lukitse).then(function(resp) {
+        Vastaajatunnus.lukitse($routeParams.kyselykertaid, tunnus.tunnus, lukitse).then(function(resp) {
           if (!resp.data) {
             console.error('resp.data missing');
           }
@@ -541,7 +541,7 @@ angular.module('kyselykerta.kyselykertaui', ['yhteiset.palvelut.i18n', 'ui.boots
     function ($uibModalInstance, $scope, i18n, tunnus) {
       $scope.i18n = i18n;
 
-      $scope.minimi = Math.max(1, tunnus.vastausten_lkm);
+      $scope.minimi = Math.max(2, tunnus.vastausten_lkm);
       $scope.vastausten_lkm = tunnus.vastausten_lkm;
       $scope.kohteiden_lkm = tunnus.kohteiden_lkm;
 
