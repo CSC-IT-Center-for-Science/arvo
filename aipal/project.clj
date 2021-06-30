@@ -64,6 +64,7 @@
             [lein-ancient "0.6.15"]
             [jonase/eastwood "0.2.3"]]
   :profiles {:dev {:source-paths ["dev"]
+                   :resource-paths ["dev-resources"]
                    :jvm-opts ["-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5006"]
                    :dependencies [[org.clojure/tools.namespace "0.2.11"]
                                   [clj-webdriver "0.6.0"]

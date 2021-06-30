@@ -211,4 +211,4 @@
         (System/exit 1)))))
 
 (defn -main [& args]
-  (kaynnista! env args))
+  (kaynnista! args))
