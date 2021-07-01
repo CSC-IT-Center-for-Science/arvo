@@ -32,6 +32,6 @@ RUN chmod 755 /home/arvo
 
 USER arvo
 COPY --from=build /opt/arvo-build/target/aipal-standalone.jar ./arvo.jar
-COPY docker/logback.xml .
+COPY docker/logback.xml resources/
 
 CMD ["java", "-jar", "arvo.jar"]

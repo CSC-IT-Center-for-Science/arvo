@@ -10,4 +10,4 @@ ansible/aipal_vagrant/salasanat/
 hs_err_pid*.log
 replay_pid*.log
 
-aipal/dev-resources/config.edn
+docker/dev.env
