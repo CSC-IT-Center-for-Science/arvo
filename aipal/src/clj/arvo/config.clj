@@ -20,4 +20,5 @@
             :merge
             [(args)
              (source/from-system-props)
-             (source/from-env)]))
+             (source/from-env)
+             (try (source/from-props-file "aipal.properties") (catch java.io.FileNotFoundException e))]))
