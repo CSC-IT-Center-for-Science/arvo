@@ -1,5 +1,5 @@
 (ns arvo.util
-  (:require [aipal.asetukset :refer [asetukset]]
+  (:require [arvo.config :refer [env]]
             [ring.util.http-response :as response]
             [ring.util.http-status :as status]))
 
@@ -16,6 +16,10 @@
                     (interpose "&")
                     (apply str))))
 
+(defn service-path [base-url]
+  (let [path (drop 3 (clojure.string/split base-url #"/"))]
+    (str "/" (clojure.string/join "/" path))))
+
 (defn api-response [body]
   (-> (response/ok body)
       (response/content-type "application/json; charset=utf-8")))
@@ -23,7 +27,7 @@
 (defn paginated-response [data key page-length api-url params]
   (let [next-id (when (= page-length (count data)) (-> data last key))
         query-params (into {} (filter second params))
-        next-url (format-url (str (-> @asetukset :server :base-url) api-url) (merge query-params {:since next-id}))]
+        next-url (format-url (str (-> env :server :base-url) api-url) (merge query-params {:since next-id}))]
     (if (some? data)
       (api-response {:data data
                      :pagination {:next_url (if next-id next-url nil)}})

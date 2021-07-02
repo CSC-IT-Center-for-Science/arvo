@@ -9,3 +9,5 @@ ansible/aipal_vagrant/salasanat/
 *.iml
 hs_err_pid*.log
 replay_pid*.log
+
+docker/dev.env

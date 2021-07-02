@@ -4,7 +4,7 @@
             [clojure.core.match :refer [match]]
             [clojure.tools.logging :as log]
             [arvo.db.core :refer [*db*] :as db]
-            [aipal.asetukset :refer [asetukset]]))
+            [arvo.config :refer [env]]))
 
 (defn format-email [tunnus template]
   (selmer/render-file template {:tunnus tunnus}))
@@ -12,7 +12,7 @@
 (defn send-email [email-data]
   (log/info "lähetetään viesti: " (:sahkoposti email-data))
   (try
-    (let [resp (postal/send-message (:email asetukset)
+    (let [resp (postal/send-message (:email env)
                                     {:from (:from email-data)
                                      :to (:sahkoposti email-data)
                                      :subject (:title email-data)

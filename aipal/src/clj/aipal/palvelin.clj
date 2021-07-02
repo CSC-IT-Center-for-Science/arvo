@@ -37,31 +37,29 @@
 
             [arvo.auth.cas-auth-middleware :refer [cas]]
             [arvo.auth.cas-middleware :refer [wrap-cas-single-sign-out]]
-
             [oph.common.infra.asetukset :refer [konfiguroi-lokitus]]
             [oph.common.infra.anon-auth :as anon-auth]
-
             [oph.common.infra.common-audit-log :refer [req-metadata-saver-wrapper konfiguroi-common-audit-lokitus]]
             [oph.common.infra.print-wrapper :refer [log-request-wrapper]]
             [oph.korma.common :refer [luo-db]]
-
-            [aipal.asetukset :refer [asetukset oletusasetukset common-audit-log-asetukset hae-asetukset build-id kehitysmoodi? service-path] :rename {asetukset asetukset-promise}]
             aipal.reitit
             [aipal.infra.kayttaja.middleware :refer [wrap-kayttaja]]
             [aipal.integraatio.kayttooikeuspalvelu :as kop]
             [aipal.infra.eraajo :as eraajo]
             [aipal.infra.kayttaja.vakiot :refer [default-test-user-uid]]
             [mount.core :as mount]
-            [arvo.db.migrations :as migrations]))
+            [arvo.db.migrations :as migrations]
+            [arvo.config :refer [env]]
+            [arvo.util :refer [service-path]]))
 
 (schema.core/set-fn-validation! true)
 
-(defn cas-server-url [asetukset]
-  (:url (:cas-auth-server asetukset)))
+(defn cas-server-url [env]
+  (:url (:cas-auth-server env)))
 
-(defn service-url [asetukset]
-  (let [base-url (get-in asetukset [:server :base-url])
-        port (get-in asetukset [:server :port])]
+(defn service-url [env]
+  (let [base-url (get-in env [:server :base-url])
+        port (get-in env [:server :port])]
     (cond
       (empty? base-url) (str "http://localhost:" port "/")
       (.endsWith base-url "/") base-url
@@ -90,7 +88,7 @@
 
 (defn auth-middleware
   [handler asetukset]
-  (when (and (kehitysmoodi? asetukset)
+  (when (and (:development-mode asetukset)
           (:unsafe-https (:cas-auth-server asetukset))
           (:enabled (:cas-auth-server asetukset)))
     (anon-auth/enable-development-mode!))
@@ -113,11 +111,11 @@
          (do
            (log/info "public API method, no CAS auth")
            (handler request))
-         (and (kehitysmoodi? asetukset) (not (:enabled (:cas-auth-server asetukset))))
+         (and (:development-mode asetukset) (not (:enabled (:cas-auth-server asetukset))))
          (do
           (log/info "development, no CAS")
           (anon-auth-handler request))
-         (and (kehitysmoodi? asetukset) ((:headers request) "uid"))
+         (and (:development-mode asetukset) ((:headers request) "uid"))
          (do
            (log/info "development, fake CAS")
            (fake-auth-handler request))
@@ -153,10 +151,6 @@
   "Ring-wrapperit ja compojure-reitit ilman HTTP-palvelinta"
   [asetukset]
 
-  (let [hostname (-> asetukset :server :base-url java.net.URL. .getHost)
-        audit-asetukset (assoc common-audit-log-asetukset :hostname hostname)]
-    (konfiguroi-common-audit-lokitus audit-asetukset))
-
   (json-gen/add-encoder org.joda.time.DateTime
                         (fn [c json-generator]
                           (.writeString json-generator (.toString c))))
@@ -190,25 +184,23 @@
 (defn ^:integration-api kaynnista-eraajon-ajastimet! [asetukset]
   (eraajo/kaynnista-ajastimet! asetukset))
 
-(defn ^:integration-api kaynnista! [alkuasetukset args]
+(defn ^:integration-api kaynnista! [args]
   (try
-    (log/info "Käynnistetään ARVO, versio " @build-id)
-    (let [asetukset (hae-asetukset alkuasetukset)
-          _ (deliver asetukset-promise asetukset)
-          _ (konfiguroi-lokitus asetukset)
-          _ (luo-db (:db asetukset))
-          _ (mount/start)
-          sammuta (hs/run-server (app asetukset)
-                                 {:port (get-in asetukset [:server :port])})]
+    (log/info "Käynnistetään ARVO")
+    (let [_ (mount/start)
+          _ (konfiguroi-lokitus env)
+          _ (luo-db (:db env))
+          sammuta (hs/run-server (app env)
+                                 {:port (get-in env [:server :port])})]
       (cond
         (some #{"migrate" "rollback"} args)
         (do (migrations/migrate args) (System/exit 0))
         :else
         (migrations/migrate ["migrate"]))
-      (when (or (not (:development-mode asetukset))
-                (:eraajo asetukset))
-        (kaynnista-eraajon-ajastimet! asetukset))
-      (log/info "Palvelin käynnistetty:" (service-url asetukset))
+      (when (or (not (:development-mode env))
+                (:eraajo env))
+        (kaynnista-eraajon-ajastimet! env))
+      (log/info "Palvelin käynnistetty:" (service-url env))
       {:sammuta sammuta})
     (catch Throwable t
       (let [virheviesti "Palvelimen käynnistys epäonnistui"]
@@ -219,4 +211,4 @@
         (System/exit 1)))))
 
 (defn -main [& args]
-  (kaynnista! oletusasetukset args))
+  (kaynnista! args))
