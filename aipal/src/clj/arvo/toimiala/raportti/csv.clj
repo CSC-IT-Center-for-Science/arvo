@@ -33,7 +33,12 @@
                                 :opiskelupaikkakunta_koodi_selite "Opiskelupaikkakunta selite"
                                 :oppilaitos_nimi "Oppilaitos"
                                 :koulutusmuoto "Koulutusmuoto"
-                                :nimi "Kyselykerta"}
+                                :nimi "Kyselykerta"
+                                :nippu "Nippulinkki"
+                                :tila "Sähköpostin lähetyksen tila"
+                                :odottaa_niputusta "Odottaa niputusta"
+                                :niputettu "Niputettu"
+                                :ei_niputeta "Ei niputeta"}
                            :sv {:vastaajatunnus "Svarskod"
                                 :vastausaika "Svarstid"
                                 :tunnus "Svarskod"
@@ -52,7 +57,12 @@
                                 :opiskelupaikkakunta_koodi_selite "Field of education"
                                 :oppilaitos_nimi "Läroanstalt"
                                 :koulutusmuoto "Utbildningsform"
-                                :nimi "Frågeformulärsomgång"}
+                                :nimi "Frågeformulärsomgång"
+                                :nippu "Nippulinkki"
+                                :tila "Status"
+                                :odottaa_niputusta "Väntar på buntning "
+                                :niputettu "Buntad"
+                                :ei_niputeta "Inte buntas"}
                            :en {:vastaajatunnus "Answer identifier" :vastausaika "Response time"
                                 :tunnus "Answer identifier"
                                 :luotuaika "TimeCreated"
@@ -70,7 +80,11 @@
                                 :opiskelupaikkakunta_koodi_selite "Municipality of education"
                                 :oppilaitos_nimi "Educational institution"
                                 :koulutusmuoto "Form of education"
-                                :nimi " Questionnaire instance"}})
+                                :nimi " Questionnaire instance"
+                                :tila "Status"
+                                :odottaa_niputusta "Waiting for bundling"
+                                :niputettu "Bundled successfully"
+                                :ei_niputeta "Not bundled"}})
 
 (def delimiter \;)
 
@@ -200,7 +214,10 @@
     [:vastaajatunnus :vastausaika :oppilaitos_nimi]
     [:vastaajatunnus :vastausaika]))
 
-(def default-vastaajatunnus-fields [:tunnus :url :luotuaika :voimassa_alkupvm :voimassa_loppupvm :vastausten_lkm :kohteiden_lkm])
+(defn default-vastaajatunnus-fields [kyselytyyppi]
+  (if (= kyselytyyppi "tyoelamapalaute")
+    [:tunnus :luotuaika :voimassa_alkupvm :voimassa_loppupvm :vastausten_lkm :kohteiden_lkm]
+    [:tunnus :url :luotuaika :voimassa_alkupvm :voimassa_loppupvm :vastausten_lkm :kohteiden_lkm]))
 
 (defn get-csv-field [kentta]
   (if (get-in kentta [:raportointi :csv :selitteet])
@@ -334,25 +351,49 @@
 (defn vastaajatunnus-url [tunnus]
   (str (:vastaus-base-url @asetukset) "/v/" (:tunnus tunnus)))
 
+(defn nippu-url [nippu]
+  (str (:vastaus-base-url @asetukset) "/n/" nippu))
+
 (defn create-header-row-single [taustatieto-fields translations]
   (concat (map #(get translations %) taustatieto-fields)
           (map #(get translations %) [:kysymysryhma :kysymys :vastaus])))
 
-(defn format-tunnus [tunnus selitteet lang]
+(defn format-metatiedot [kyselytyyppi lang metatiedot]
+  (if (= kyselytyyppi "tyoelamapalaute")
+    (let [nippu (:nippu metatiedot)
+          tila (or (keyword (:tila metatiedot))
+                   (if (nil? nippu)
+                     :odottaa_niputusta
+                     :niputettu))]
+         (merge metatiedot
+                {:tila (get-in default-translations [lang tila])
+                 :nippu (when nippu (nippu-url nippu))}))))
+
+(defn format-tunnus [tunnus kyselytyyppi selitteet lang]
   (-> (merge (:taustatiedot tunnus) tunnus)
+      (merge (format-metatiedot kyselytyyppi lang (:metatiedot tunnus)))
       (assoc :url (vastaajatunnus-url tunnus))
       (update :voimassa_alkupvm format-date)
       (update :voimassa_loppupvm format-date)
       (update :luotuaika format-date)
       (lisaa-selitteet selitteet lang)))
 
+(defn vastaajatunnuksen-metatieto-kentat [kyselytyyppi]
+  (case kyselytyyppi
+    "amispalaute" [:tila]
+    "tyoelamapalaute" [:tila :nippu]
+    []))
+
 (defn vastaajatunnus-csv [kyselykertaid lang]
   (let [kyselyid (:kyselyid (db/hae-kyselykerta {:kyselykertaid kyselykertaid}))
+        kyselytyyppi (:tyyppi (db/hae-kysely {:kyselyid kyselyid}))
         selitteet (hae-selitteet kyselyid)
-        tunnukset (map #(format-tunnus % selitteet lang) (db/hae-vastaajatunnus {:kyselykertaid kyselykertaid}))
+        tunnukset (map #(format-tunnus % kyselytyyppi selitteet lang) (db/hae-vastaajatunnus {:kyselykertaid kyselykertaid}))
         taustatiedot (db/kyselyn-kentat {:kyselyid kyselyid})
         translations (luo-käännökset taustatiedot lang)
-        vastaajatunnus-kentat (concat default-vastaajatunnus-fields (taustatieto-kentat taustatiedot))
+        vastaajatunnus-kentat (concat (default-vastaajatunnus-fields kyselytyyppi)
+                                      (taustatieto-kentat taustatiedot)
+                                      (vastaajatunnuksen-metatieto-kentat kyselytyyppi))
         header (map #(get translations %) vastaajatunnus-kentat)
         rows (map #(select-values-or-nil % vastaajatunnus-kentat) tunnukset)]
     (create-csv (cons header rows))))

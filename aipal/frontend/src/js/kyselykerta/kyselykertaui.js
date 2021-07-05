@@ -55,6 +55,17 @@ angular.module('kyselykerta.kyselykertaui', ['yhteiset.palvelut.i18n', 'ui.boots
       $scope.kieli = kieli
       $scope.laajennettuOppisopimuskoulutus = kayttooikeudet.laajennettuOppisopimuskoulutus();
 
+      $scope.status_images = {'niputettu': '/img/circle-green.svg',
+                             'lahetetty': '/img/circle-green.svg',
+                             'odottaa_niputusta': '/img/circle-yellow.svg',
+                             'odottaa_lahetysta': '/img/circle-yellow.svg',
+                             'ei_niputeta': '/img/circle-red.svg',
+                             'lahetys_epaonnistunut': '/img/circle-red.svg'}
+
+      $scope.nippu_status = function (nippu){
+        return _.get(nippu, 'metatiedot.tila', 'odottaa_lahetysta');
+      }
+
       const templateMap = {
         'avop': 'template/kysely/palautekysely-tunnukset.html',
         'rekrykysely': 'template/kysely/rekrykysely-tunnukset.html',
