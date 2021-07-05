@@ -128,14 +128,15 @@ WHERE vt.tunnus IN (:v*:tunnukset)
 AND vt.metatiedot->>'nippu' IS NULL;
 
 -- :name hae-kyselykerran-niput :? :*
-SELECT DISTINCT n.tunniste, n.kyselyid, n.voimassa_alkupvm, n.voimassa_loppupvm, n.taustatiedot,
+SELECT DISTINCT n.tunniste, n.kyselyid, n.voimassa_alkupvm, n.voimassa_loppupvm, n.taustatiedot, n.metatiedot,
                 count(vt) AS kohteiden_lkm, count(v) AS vastausten_lkm FROM nippu n
 JOIN kysely k ON n.kyselyid = k.kyselyid
 JOIN kyselykerta kk ON k.kyselyid = kk.kyselyid
 LEFT JOIN vastaajatunnus vt ON vt.metatiedot->>'nippu' = n.tunniste
 LEFT JOIN vastaaja v ON vt.vastaajatunnusid = v.vastaajatunnusid
 WHERE kk.kyselykertaid = :kyselykertaid
-GROUP BY n.tunniste, n.kyselyid, n.voimassa_alkupvm, n.kyselyid, n.tunniste, n.voimassa_loppupvm, n.taustatiedot;
+GROUP BY n.tunniste, n.kyselyid, n.voimassa_alkupvm, n.kyselyid, n.tunniste, n.voimassa_loppupvm, n.taustatiedot
+ORDER BY voimassa_alkupvm DESC;
 
 -- :name hae-nippu :? :1
 SELECT * FROM nippu WHERE tunniste = :tunniste;
