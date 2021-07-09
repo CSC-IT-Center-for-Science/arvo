@@ -17,7 +17,6 @@
             [oph.korma.common :refer [select-unique]]
             [aipal.infra.kayttaja :refer [vastuukayttaja? yllapitaja?]]
             [aipal.integraatio.sql.korma :as taulut]
-            [aipal.auditlog :as auditlog]
             [clojure.tools.logging :as log]
             [aipal.infra.kayttaja :refer [*kayttaja*]]
             [aipal.toimiala.raportti.taustakysymykset :refer :all]
@@ -93,7 +92,6 @@
 (defn lisaa-kysymysryhma! [kysymysryhma-data]
   (let [kysymysryhma  (merge tyhja-kysymysryhma (assoc kysymysryhma-data :kayttaja (:oid *kayttaja*)))
         kysymysryhma-id (db/lisaa-kysymysryhma! kysymysryhma)]
-    (auditlog/kysymysryhma-luonti! (:kysymysryhmaid kysymysryhma-id) (:nimi_fi (:nimi_fi kysymysryhma)))
     (first kysymysryhma-id)))
 
 (def tyhja-kysymys { :kysymysryhmaid nil
@@ -118,7 +116,6 @@
 (defn lisaa-kysymys! [kysymys-data kysymysryhmaid]
   (let [kysymys (assoc (merge tyhja-kysymys kysymys-data) :kayttaja (:oid *kayttaja*))
          kysymysid (db/lisaa-kysymys! kysymys)]
-    (auditlog/kysymys-luonti! (:kysymysryhmaid kysymysryhmaid) (:kysymysid kysymysid))
     kysymysid))
 
 (defn liita-jatkokysymys! [kysymysid jatkokysymysid vastaus]
@@ -126,7 +123,6 @@
 
 
 (defn lisaa-monivalintavaihtoehto! [v]
-  (auditlog/kysymys-monivalinnat-luonti! (:kysymysid v))
   (sql/insert :monivalintavaihtoehto
     (sql/values v)))
 
@@ -349,7 +345,6 @@
 
 (defn paivita!
   [kysymysryhma]
-  (auditlog/kysymysryhma-muokkaus! (:kysymysryhmaid kysymysryhma))
   (->
     (sql/update* taulut/kysymysryhma)
     (sql/set-fields (assoc (select-keys kysymysryhma [:nimi_fi :nimi_sv :nimi_en :selite_fi :selite_sv :selite_en :kuvaus_fi :kuvaus_sv :kuvaus_en
@@ -360,13 +355,11 @@
 
 (defn poista!
   [kysymysryhmaid]
-  (auditlog/kysymysryhma-poisto! kysymysryhmaid)
   (sql/delete taulut/kysymysryhma
     (sql/where {:kysymysryhmaid kysymysryhmaid})))
 
 (defn poista-kysymyksen-monivalintavaihtoehdot!
   [kysymysid]
-  (auditlog/kysymys-monivalinnat-poisto! kysymysid)
   (db/poista-monivalintavaihtoehdot! {:kysymysidt kysymysid}))
 
 (defn poista-jatkokysymys! [kysymysid]
@@ -394,19 +387,16 @@
 (defn julkaise!
   [kysymysryhmaid]
   (when (julkaistavissa? kysymysryhmaid)
-    (auditlog/kysymysryhma-muokkaus! kysymysryhmaid :julkaistu)
     (aseta-tila! kysymysryhmaid "julkaistu")))
 
 (defn sulje!
   [kysymysryhmaid]
-  (auditlog/kysymysryhma-muokkaus! kysymysryhmaid :suljettu)
   (aseta-tila! kysymysryhmaid "suljettu"))
 
 (defn palauta-luonnokseksi!
   [kysymysryhmaid]
-  (when (julkaistu? kysymysryhmaid))
-  (auditlog/kysymysryhma-muokkaus! kysymysryhmaid :luonnos)
-  (aseta-tila! kysymysryhmaid "luonnos"))
+  (when (julkaistu? kysymysryhmaid)
+    (aseta-tila! kysymysryhmaid "luonnos")))
 
 (defn laske-kysymykset
   [kysymysryhmaid]

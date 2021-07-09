@@ -39,7 +39,6 @@
             [arvo.auth.cas-middleware :refer [wrap-cas-single-sign-out]]
             [oph.common.infra.asetukset :refer [konfiguroi-lokitus]]
             [oph.common.infra.anon-auth :as anon-auth]
-            [oph.common.infra.common-audit-log :refer [req-metadata-saver-wrapper konfiguroi-common-audit-lokitus]]
             [oph.common.infra.print-wrapper :refer [log-request-wrapper]]
             [oph.korma.common :refer [luo-db]]
             aipal.reitit
@@ -170,7 +169,6 @@
 
       (auth-middleware asetukset)
       log-request-wrapper
-      req-metadata-saver-wrapper   ;; Huom: Tämän oltava "auth-middleware":n jälkeen
 
       (wrap-frame-options :deny)
       (wrap-cas-single-sign-out session-store session-map)
