@@ -15,7 +15,6 @@
 (ns aipal.arkisto.kyselypohja
   (:require [oph.korma.common :refer [select-unique select-unique-or-nil]]
             [aipal.infra.kayttaja :refer [yllapitaja? *kayttaja*]]
-            [aipal.auditlog :as auditlog]
             [arvo.db.core :refer [*db*] :as db]
             [clojure.java.jdbc :as jdbc]
             [clojure.tools.logging :as log]))
@@ -34,7 +33,6 @@
 (def kyselypohja-defaults (zipmap muokattavat-kentat (repeat nil)))
 
 (defn tallenna-kyselypohjan-kysymysryhmat! [tx kyselypohjaid kysymysryhmat]
-  (auditlog/kyselypohja-muokkaus! kyselypohjaid)
   (db/poista-kyselypohjan-kysymysryhmat! {:kyselypohjaid kyselypohjaid})
   (doseq [[index kysymysryhma] (map-indexed vector kysymysryhmat)]
     (db/tallenna-kyselypohjan-kysymysryhma! tx {:kyselypohjaid kyselypohjaid
@@ -73,7 +71,6 @@
   (aseta-kyselypohjan-tila! kyselypohjaid "suljettu"))
 
 (defn poista-kyselypohja! [kyselypohjaid]
-  (auditlog/kyselypohja-poisto! kyselypohjaid)
   (jdbc/with-db-transaction [tx *db*]
     (db/poista-kyselypohjan-kysymysryhmat! tx {:kyselypohjaid kyselypohjaid})
     (db/poista-kyselypohja! tx {:kyselypohjaid kyselypohjaid})))

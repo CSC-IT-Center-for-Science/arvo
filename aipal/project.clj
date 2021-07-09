@@ -56,8 +56,7 @@
                  [listora/again "1.0.0"]
                  [selmer "1.12.28"]
                  [com.draines/postal "2.0.3"]
-                 [cprop "0.1.17"]
-                 [biz.paluch.logging/logstash-gelf "1.14.0"]]
+                 [cprop "0.1.17"]]
 
   :plugins [[test2junit "1.0.1"]
             [codox "0.8.12"]

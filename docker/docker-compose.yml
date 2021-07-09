@@ -10,3 +10,7 @@ services:
       - "8082:8082"
     env_file:
       - dev.env
+    volumes:
+      - type: bind
+        target: /opt/arvo/logs
+        source: ../logs
