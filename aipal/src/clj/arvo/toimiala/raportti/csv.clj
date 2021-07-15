@@ -75,6 +75,7 @@
                                 :tutkintotunnus "Tutkinto"
                                 :vastausten_lkm "RespondentCount" :vastaajien_lkm "RespondentCount" :kohteiden_lkm "ResponseCount"
                                 :tutkinto_selite "Name of degree"
+                                :tutkinnon_osa_selite "Name of the qualification unit"
                                 :hankintakoulutuksen_toteuttaja_selite "Name of provider (procured training)"
                                 :toimipiste_selite "Name of operational unit"
                                 :koulutustoimija_selite "Name of education provider"
