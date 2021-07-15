@@ -130,7 +130,9 @@ AND vt.metatiedot->>'nippu' IS NULL;
 -- :name hae-kyselykerran-niput :? :*
 SELECT DISTINCT n.tunniste, n.kyselyid, n.voimassa_alkupvm, n.voimassa_loppupvm, n.taustatiedot, n.metatiedot,
                 t.nimi_fi AS tutkinto_fi, t.nimi_sv AS tutkinto_sv, t.nimi_en AS tutkinto_en,
-                count(vt) AS kohteiden_lkm, count(v) AS vastausten_lkm
+                count(vt) AS kohteiden_lkm, count(v) AS vastausten_lkm,
+                (n.voimassa_alkupvm >= current_date AND (current_date <= n.voimassa_loppupvm OR n.voimassa_loppupvm IS NULL)
+                    AND k.kaytettavissa) AS kaytettavissa
 FROM nippu n
 JOIN kysely k ON n.kyselyid = k.kyselyid
 JOIN kyselykerta kk ON k.kyselyid = kk.kyselyid
@@ -139,7 +141,7 @@ LEFT JOIN vastaaja v ON vt.vastaajatunnusid = v.vastaajatunnusid
 LEFT JOIN tutkinto t ON n.taustatiedot->>'tutkinto' = t.tutkintotunnus
 WHERE kk.kyselykertaid = :kyselykertaid
 GROUP BY n.tunniste, n.kyselyid, n.voimassa_alkupvm, n.kyselyid, n.tunniste, n.voimassa_loppupvm, n.taustatiedot,
-         t.nimi_fi, t.nimi_sv, t.nimi_en
+         t.nimi_fi, t.nimi_sv, t.nimi_en, k.kaytettavissa
 ORDER BY voimassa_alkupvm DESC;
 
 -- :name hae-nippu :? :1
@@ -160,3 +162,10 @@ UPDATE vastaajatunnus SET metatiedot = metatiedot - 'nippu' WHERE metatiedot->>'
 -- :name paivita-nipun-metatiedot! :! :n
 UPDATE nippu SET metatiedot = COALESCE(metatiedot || :metatiedot, :metatiedot)
 WHERE tunniste = :tunniste;
+
+SELECT vt.* from vastaajatunnus vt
+JOIN kyselykerta kk on vt.kyselykertaid = kk.kyselykertaid
+JOIN kysely k on kk.kyselyid = k.kyselyid
+WHERE k.tyyppi = 'tyoelamapalaute'
+AND vt.valmistavan_koulutuksen_oppilaitos IS NULL
+ORDER BY vt.voimassa_loppupvm DESC;

@@ -209,9 +209,9 @@
             </tfoot>
             <tbody>
             <tr ng-repeat="nippu in niput"
-                ng-class="{voimassa: nippu.kohteiden_lkm > nippu.vastausten_lkm}"
+                ng-class="{voimassa: nippu.kaytettavissa && nippu.kohteiden_lkm > nippu.vastausten_lkm}"
                 ts-repeat>
-                <td class="e2e-vastaajatunnus-url">{{vastausBaseUrl}}/n/{{nippu.tunniste}}</td>
+                <td class="e2e-vastaajatunnus-url">{{nippu.tunniste}}</td>
                 <td>{{nippu.voimassa_alkupvm | voimassaoloAika: nippu.voimassa_loppupvm}}</td>
                 <td>
                     <div>{{nippu.taustatiedot.tyonantaja}}</div>

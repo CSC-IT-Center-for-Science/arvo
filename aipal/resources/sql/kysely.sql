@@ -4,7 +4,8 @@ SELECT v.vastausid, k.kysymysid, vs.vastaajaid,
   vs.luotuaika AS vastaaja_luotuaika,
   vt.tunnus AS vastaajatunnus, vt.tutkintotunnus, vt.taustatiedot,
   k.kysymysryhmaid, k.vastaustyyppi, o.oppilaitoskoodi,
-       o.nimi_fi AS oppilaitos_nimi_fi, o.nimi_sv AS oppilaitos_nimi_sv, o.nimi_en AS oppilaitos_nimi_en
+       o.nimi_fi AS oppilaitos_nimi_fi, o.nimi_sv AS oppilaitos_nimi_sv, o.nimi_en AS oppilaitos_nimi_en,
+       k.metatiedot->>'koodisto' AS koodisto
 FROM vastaus v
   JOIN kysymys k ON v.kysymysid = k.kysymysid
   JOIN kysymysryhma kr ON k.kysymysryhmaid = kr.kysymysryhmaid
