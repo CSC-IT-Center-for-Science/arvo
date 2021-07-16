@@ -162,10 +162,3 @@ UPDATE vastaajatunnus SET metatiedot = metatiedot - 'nippu' WHERE metatiedot->>'
 -- :name paivita-nipun-metatiedot! :! :n
 UPDATE nippu SET metatiedot = COALESCE(metatiedot || :metatiedot, :metatiedot)
 WHERE tunniste = :tunniste;
-
-SELECT vt.* from vastaajatunnus vt
-JOIN kyselykerta kk on vt.kyselykertaid = kk.kyselykertaid
-JOIN kysely k on kk.kyselyid = k.kyselyid
-WHERE k.tyyppi = 'tyoelamapalaute'
-AND vt.valmistavan_koulutuksen_oppilaitos IS NULL
-ORDER BY vt.voimassa_loppupvm DESC;

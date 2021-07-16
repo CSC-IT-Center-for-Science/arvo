@@ -51,7 +51,7 @@
                                 :tutkintotunnus "Tutkinto"
                                 :vastausten_lkm "Respondents antal" :vastaajien_lkm "Respondents antal" :kohteiden_lkm "Svarsantal"
                                 :tutkinto_selite "Namn på examen"
-                                :tutkinnon_osa_selite "Namn på nimi"
+                                :tutkinnon_osa_selite "Namn på examensdel"
                                 :hankintakoulutuksen_toteuttaja_selite "Namn på anordnaren av anskaffad utbildning"
                                 :toimipiste_selite "Namn på verksamhetsställe"
                                 :koulutustoimija_selite "Namn på utbildningsaktör"
