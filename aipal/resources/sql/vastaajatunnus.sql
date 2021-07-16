@@ -128,14 +128,21 @@ WHERE vt.tunnus IN (:v*:tunnukset)
 AND vt.metatiedot->>'nippu' IS NULL;
 
 -- :name hae-kyselykerran-niput :? :*
-SELECT DISTINCT n.tunniste, n.kyselyid, n.voimassa_alkupvm, n.voimassa_loppupvm, n.taustatiedot,
-                count(vt) AS kohteiden_lkm, count(v) AS vastausten_lkm FROM nippu n
+SELECT DISTINCT n.tunniste, n.kyselyid, n.voimassa_alkupvm, n.voimassa_loppupvm, n.taustatiedot, n.metatiedot,
+                t.nimi_fi AS tutkinto_fi, t.nimi_sv AS tutkinto_sv, t.nimi_en AS tutkinto_en,
+                count(vt) AS kohteiden_lkm, count(v) AS vastausten_lkm,
+                (n.voimassa_alkupvm >= current_date AND (current_date <= n.voimassa_loppupvm OR n.voimassa_loppupvm IS NULL)
+                    AND k.kaytettavissa) AS kaytettavissa
+FROM nippu n
 JOIN kysely k ON n.kyselyid = k.kyselyid
 JOIN kyselykerta kk ON k.kyselyid = kk.kyselyid
 LEFT JOIN vastaajatunnus vt ON vt.metatiedot->>'nippu' = n.tunniste
 LEFT JOIN vastaaja v ON vt.vastaajatunnusid = v.vastaajatunnusid
+LEFT JOIN tutkinto t ON n.taustatiedot->>'tutkinto' = t.tutkintotunnus
 WHERE kk.kyselykertaid = :kyselykertaid
-GROUP BY n.tunniste, n.kyselyid, n.voimassa_alkupvm, n.kyselyid, n.tunniste, n.voimassa_loppupvm, n.taustatiedot;
+GROUP BY n.tunniste, n.kyselyid, n.voimassa_alkupvm, n.kyselyid, n.tunniste, n.voimassa_loppupvm, n.taustatiedot,
+         t.nimi_fi, t.nimi_sv, t.nimi_en, k.kaytettavissa
+ORDER BY voimassa_alkupvm DESC;
 
 -- :name hae-nippu :? :1
 SELECT * FROM nippu WHERE tunniste = :tunniste;

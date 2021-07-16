@@ -17,7 +17,7 @@
    (s/optional-key :toimipiste_oid)                 (s/maybe s/Str) ;organisaatio-oid
    (s/optional-key :hankintakoulutuksen_toteuttaja) (s/maybe s/Str)
    :request_id                                      s/Str
-   (s/optional-key :metatiedot)                     Vastaajatunnus-metatiedot})
+   (s/optional-key :metatiedot)                     {(s/optional-key :tila) s/Str}})
 
 (s/defschema Tyoelamapalaute-tunnus
   {:koulutustoimija_oid                        s/Str

@@ -90,8 +90,8 @@
       (vastauslinkki-response tunnus (:request_id data))))
   (PATCH "/:tunnus/metatiedot" []
     :path-params [tunnus :- s/Str]
-    :body [metatiedot Vastaajatunnus-metatiedot]
-    :responses {status/ok {:schema Vastaajatunnus-metatiedot}
+    :body [metatiedot {(s/optional-key :tila) s/Str}]
+    :responses {status/ok {:schema {(s/optional-key :tila) s/Str}}
                 status/not-found {:schema s/Str :description "Ei vastaajatunnusta integraatiokäyttäjälle"}}
     :summary "Metatietojen päivitys"
     :description "Päivitä vastaajatunnuksen valitut metatiedot. Ei voi käyttää metatietokentän poistamiseen."
@@ -121,7 +121,6 @@
     :summary "Yksittäisen vastaajatunnuksen luominen"
     (let [luotu-tunnus (vt/lisaa-tyoelamapalaute-tunnus! data)]
       (vastaajatunnus-response luotu-tunnus (:request-id data))))
-
   (DELETE "/vastaajatunnus/:tunnus" []
     :path-params [tunnus :- s/Str]
     :responses {status/ok {:schema s/Str :description "Tunnus poistettu"}
@@ -143,7 +142,7 @@
 
   (PATCH "/nippu/:tunniste/metatiedot" []
     :path-params [tunniste :- s/Str]
-    :body [metatiedot Vastaajatunnus-metatiedot]
+    :body [metatiedot {(s/optional-key :tila) s/Str}]
     :summary "Nipun metatietojen päivitys"
     (let [paivitettavat-metatiedot (select-keys metatiedot sallitut-metatiedot)
           rivia-paivitetty (vt/paivita-nipun-metatiedot tunniste metatiedot)]
