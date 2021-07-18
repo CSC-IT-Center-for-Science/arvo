@@ -2,7 +2,7 @@
   (:require [schema.core :as s]))
 
 (s/defschema Vastaajatunnus-metatiedot
-  {(s/optional-key :tila) (s/enum "success" "failure" "bounced")})
+  {(s/optional-key :tila) s/Str})
 
 (def Kieli (s/constrained String #(= 2 (count %))))
 

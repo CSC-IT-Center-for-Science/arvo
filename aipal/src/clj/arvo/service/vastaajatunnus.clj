@@ -160,11 +160,22 @@
       (vastaajatunnus/poista-nippu tunniste)
       {:error "Nipussa on jo vastauksia"})))
 
-(defn paivita-metatiedot [tunnus paivitettavat-metatiedot]
-  (let [paivitettava-vastaajatunnus {:metatiedot paivitettavat-metatiedot
+(defn paivita-tila [metatiedot vanhat-metatiedot]
+  (if (= (:tila vanhat-metatiedot) "lahetetty")
+    (assoc metatiedot :tila "lahetetty")
+    metatiedot))
+
+(defn paivita-metatiedot [tunnus metatiedot]
+  (let [vanhat-metatiedot (:metatiedot (db/hae-vastaajatunnuksen-tiedot {:tunnus tunnus}))
+        paivitettavat-metatiedot (paivita-tila metatiedot vanhat-metatiedot)
+        paivitettava-vastaajatunnus {:metatiedot paivitettavat-metatiedot
                                      :tunnus tunnus
-                                     :kayttaja aipal.infra.kayttaja.vakiot/integraatio-uid}]
-    (db/paivita-metatiedot! paivitettava-vastaajatunnus)))
+                                     :kayttaja aipal.infra.kayttaja.vakiot/integraatio-uid}
+        riveja-paivitetty (db/paivita-metatiedot! paivitettava-vastaajatunnus)]
+    (assoc paivitettavat-metatiedot :riveja riveja-paivitetty)))
 
 (defn paivita-nipun-metatiedot [tunniste metatiedot]
-  (db/paivita-nipun-metatiedot! {:tunniste tunniste :metatiedot metatiedot}))
+  (let [vanhat-metatiedot (:metatiedot (db/hae-nippu {:tunniste tunniste}))
+        paivitettavat-metatiedot (paivita-tila metatiedot vanhat-metatiedot)
+        riveja-paivitetty (db/paivita-nipun-metatiedot! {:tunniste tunniste :metatiedot paivitettavat-metatiedot})]
+    (assoc paivitettavat-metatiedot :riveja riveja-paivitetty)))

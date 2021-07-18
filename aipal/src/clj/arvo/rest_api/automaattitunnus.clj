@@ -96,9 +96,9 @@
     :summary "Metatietojen päivitys"
     :description "Päivitä vastaajatunnuksen valitut metatiedot. Ei voi käyttää metatietokentän poistamiseen."
     (let [paivitettavat-metatiedot (select-keys metatiedot sallitut-metatiedot)
-          rivia-paivitetty (vt/paivita-metatiedot tunnus metatiedot)]
-      (if (not= rivia-paivitetty 0)
-        (api-response paivitettavat-metatiedot)
+          paivitetyt-metatiedot (vt/paivita-metatiedot tunnus paivitettavat-metatiedot)]
+      (if (not= (:riveja paivitetyt-metatiedot) 0)
+        (api-response (dissoc paivitetyt-metatiedot :riveja))
         (response/not-found "Ei vastaajatunnusta integraatiokäyttäjälle"))))
   (GET "/status/:tunnus" []
     :path-params [tunnus :- s/Str]
@@ -152,9 +152,9 @@
     :body [metatiedot Vastaajatunnus-metatiedot]
     :summary "Nipun metatietojen päivitys"
     (let [paivitettavat-metatiedot (select-keys metatiedot sallitut-metatiedot)
-          rivia-paivitetty (vt/paivita-nipun-metatiedot tunniste metatiedot)]
-      (if (not= rivia-paivitetty 0)
-        (api-response paivitettavat-metatiedot)
+          paivitetyt-metatiedot (vt/paivita-nipun-metatiedot tunniste paivitettavat-metatiedot)]
+      (if (not= (:riveja paivitetyt-metatiedot) 0)
+        (api-response (dissoc paivitetyt-metatiedot :riveja))
         (response/not-found "Ei nippua integraatiokäyttäjälle"))))
 
   (DELETE "/nippu/:tunniste" []
