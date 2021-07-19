@@ -102,7 +102,7 @@
         (response/not-found "Ei vastaajatunnusta integraatiokäyttäjälle"))))
   (GET "/status/:tunnus" []
     :path-params [tunnus :- s/Str]
-    :return (s/maybe {:tunnus s/Str :voimassa_loppupvm org.joda.time.DateTime :vastattu s/Bool})
+    :return (s/maybe {:tunnus s/Str :voimassa_loppupvm (s/maybe org.joda.time.DateTime) :vastattu s/Bool})
     :summary "Kyselylinkin tila"
     (let [status (db/vastaajatunnus-status {:tunnus tunnus})]
       (api-response (dissoc status :vastaajatunnusid))))
