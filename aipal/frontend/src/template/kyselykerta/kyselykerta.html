@@ -174,54 +174,59 @@
                 </tr>
             </tbody>
         </table>
-            <table class="table table-striped vastaajatunnus-taulukko" ts-wrapper
-                   ng-if="(kysely.tyyppi === 'tyoelamapalaute') ">
-                <thead>
-                <tr>
-                    <th ts-criteria="tunnus">{{'i18n.vastaajatunnus.nippulinkki'|i18n}}</th>
-                    <th ts-criteria="voimassa_alkupvm">{{'kyselykerta.vastausaika' | i18n}}</th>
-                    <th ts-criteria="tyonantaja">{{'vastaajatunnus.tyopaikka' | i18n}}</th>
-                    <th ts-criteria="tutkinto|lokalisoiKentta:'nimi'">{{'i18n.vastaajatunnus.tutkinto'|i18n}}</th>
-                    <th ts-criteria="vastausten_lkm">{{'i18n.vastaajatunnus.vastauksia'|i18n}}</th>
-                    <th></th>
-                </tr>
-                </thead>
-                <tfoot>
-                <tr>
-                    <td colspan="5">
-                        {{'vastaajatunnus.vastauksia'|i18n}}
-                    </td>
-                    <td>
-                        <strong>{{getVastaustenLkm()}} / {{getVastaajienLkm()}}</strong>
-                    </td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td colspan="5">
-                        {{'i18n.vastaajatunnus.vastausprosentti'|i18n}}
-                    </td>
-                    <td>
-                        <uib-progressbar value="getVastausProsentti() | number:0"><span>{{getVastausProsentti(rahoitusmuodot.rahoitusmuotoid) | number:0}}%</span></uib-progressbar>
-                    </td>
-                    <td></td>
-                </tr>
-                </tfoot>
-                <tbody>
-                <tr ng-repeat="nippu in niput"
-                    ng-class="{voimassa: nippu.kohteiden_lkm > nippu.vastausten_lkm}"
-                    ts-repeat>
-                    <td class="e2e-vastaajatunnus-url">{{vastausBaseUrl}}/n/{{nippu.tunniste}}</td>
-                    <td>{{nippu.voimassa_alkupvm | voimassaoloAika: nippu.voimassa_loppupvm}}</td>
-                    <td>
-                        <div>{{nippu.taustatiedot.tyonantaja}}</div>
-                        <div>{{nippu.taustatiedot.tyopaikka}}</div>
-                    </td>
-                    <td>{{nippu.tutkinto | lokalisoiKentta:'nimi'}}</td>
-                    <td>{{nippu.vastausten_lkm}} / {{nippu.kohteiden_lkm}}</td>
-                    <td class="nowrap actions"> </td>
-                </tr>
-                </tbody>
-            </table>
+        <table class="table table-striped vastaajatunnus-taulukko" ts-wrapper
+               ng-if="(kysely.tyyppi === 'tyoelamapalaute') ">
+            <thead>
+            <tr>
+                <th ts-criteria="tunnus">{{'i18n.vastaajatunnus.nippulinkki'|i18n}}</th>
+                <th ts-criteria="voimassa_alkupvm">{{'kyselykerta.vastausaika' | i18n}}</th>
+                <th ts-criteria="tyonantaja">{{'vastaajatunnus.tyopaikka' | i18n}}</th>
+                <th ts-criteria="tutkinto|lokalisoiKentta:'nimi'">{{'i18n.vastaajatunnus.tutkinto'|i18n}}</th>
+                <th ts-criteria="vastausten_lkm">{{'i18n.vastaajatunnus.vastauksia'|i18n}}</th>
+                <th ts-criteria="tila">Tila</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tfoot>
+            <tr>
+                <td colspan="5">
+                    {{'vastaajatunnus.vastauksia'|i18n}}
+                </td>
+                <td>
+                    <strong>{{getVastaustenLkm()}} / {{getVastaajienLkm()}}</strong>
+                </td>
+                <td></td>
+            </tr>
+            <tr>
+                <td colspan="5">
+                    {{'i18n.vastaajatunnus.vastausprosentti'|i18n}}
+                </td>
+                <td>
+                    <uib-progressbar value="getVastausProsentti() | number:0"><span>{{getVastausProsentti(rahoitusmuodot.rahoitusmuotoid) | number:0}}%</span></uib-progressbar>
+                </td>
+                <td></td>
+            </tr>
+            </tfoot>
+            <tbody>
+            <tr ng-repeat="nippu in niput"
+                ng-class="{voimassa: nippu.kaytettavissa && nippu.kohteiden_lkm > nippu.vastausten_lkm}"
+                ts-repeat>
+                <td class="e2e-vastaajatunnus-url">{{nippu.tunniste}}</td>
+                <td>{{nippu.voimassa_alkupvm | voimassaoloAika: nippu.voimassa_loppupvm}}</td>
+                <td>
+                    <div>{{nippu.taustatiedot.tyonantaja}}</div>
+                    <div>{{nippu.taustatiedot.tyopaikka}}</div>
+                </td>
+                <td>{{nippu.tutkinto | lokalisoiKentta:'nimi'}}</td>
+                <td>{{nippu.vastausten_lkm}} / {{nippu.kohteiden_lkm}}</td>
+                <td class="e2e-tila">
+                    <img src="{{status_images[nippu_status(nippu)]}}" alt="{{'i18n.vastaajatunnus.tila.' + nippu_status(nippu) | i18n}}"
+                         title="{{'i18n.vastaajatunnus.tila.' + nippu_status(nippu) | i18n}}"/>
+                </td>
+                <td class="nowrap actions"> </td>
+            </tr>
+            </tbody>
+        </table>
         </div>
     </div>
 </div>

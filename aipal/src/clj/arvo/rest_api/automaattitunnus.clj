@@ -90,8 +90,8 @@
       (vastauslinkki-response tunnus (:request_id data))))
   (PATCH "/:tunnus/metatiedot" []
     :path-params [tunnus :- s/Str]
-    :body [metatiedot Vastaajatunnus-metatiedot]
-    :responses {status/ok {:schema Vastaajatunnus-metatiedot}
+    :body [metatiedot {(s/optional-key :tila) s/Str}]
+    :responses {status/ok {:schema {(s/optional-key :tila) s/Str}}
                 status/not-found {:schema s/Str :description "Ei vastaajatunnusta integraatiokäyttäjälle"}}
     :summary "Metatietojen päivitys"
     :description "Päivitä vastaajatunnuksen valitut metatiedot. Ei voi käyttää metatietokentän poistamiseen."
@@ -127,13 +127,12 @@
     :summary "Kyselylinkin tila"
     (let [status (db/nippu-status {:tunniste tunniste})]
       (api-response status)))
-
   (DELETE "/vastaajatunnus/:tunnus" []
     :path-params [tunnus :- s/Str]
     :responses {status/ok {:schema s/Str :description "Tunnus poistettu"}
                 status/not-found {:schema s/Str :description "Tunnuksella on jo vastauksia"}}
     :summary "Poista vastaajatunnus"
-    (poista-vastaajatunnus tunnus))
+    (poista-vastaajatunnus tunnus))         
   (POST "/nippu" []
     :body [data Nippulinkki]
     :responses {status/ok {:schema {:nippulinkki s/Str :voimassa_loppupvm org.joda.time.DateTime}}
@@ -149,7 +148,7 @@
 
   (PATCH "/nippu/:tunniste/metatiedot" []
     :path-params [tunniste :- s/Str]
-    :body [metatiedot Vastaajatunnus-metatiedot]
+    :body [metatiedot {(s/optional-key :tila) s/Str}]
     :summary "Nipun metatietojen päivitys"
     (let [paivitettavat-metatiedot (select-keys metatiedot sallitut-metatiedot)
           paivitetyt-metatiedot (vt/paivita-nipun-metatiedot tunniste paivitettavat-metatiedot)]

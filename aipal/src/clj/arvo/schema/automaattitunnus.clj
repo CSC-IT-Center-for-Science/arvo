@@ -19,7 +19,7 @@
    (s/optional-key :hankintakoulutuksen_toteuttaja) (s/maybe s/Str)
    (s/optional-key :heratepvm)                      (s/maybe s/Str)
    :request_id                                      s/Str
-   (s/optional-key :metatiedot)                     Vastaajatunnus-metatiedot})
+   (s/optional-key :metatiedot)                     {(s/optional-key :tila) s/Str}})
 
 (s/defschema Tyoelamapalaute-tunnus
   {:koulutustoimija_oid                        s/Str
