@@ -217,7 +217,7 @@
                     <div>{{nippu.taustatiedot.tyonantaja}}</div>
                     <div>{{nippu.taustatiedot.tyopaikka}}</div>
                 </td>
-                <td>{{nippu| lokalisoiKentta:'tutkinto'}}</td>
+                <td>{{nippu.tutkinto | lokalisoiKentta:'nimi'}}</td>
                 <td>{{nippu.vastausten_lkm}} / {{nippu.kohteiden_lkm}}</td>
                 <td class="e2e-tila">
                     <img src="{{status_images[nippu_status(nippu)]}}" alt="{{'i18n.vastaajatunnus.tila.' + nippu_status(nippu) | i18n}}"
