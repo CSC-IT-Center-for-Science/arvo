@@ -67,6 +67,9 @@ WHERE vt.kyselykertaid = :kyselykertaid
 --~ (if (:oid params) "AND vt.luotu_kayttaja = :oid")
 ORDER BY vt.luotuaika DESC;
 
+-- :name hae-vastaajatunnuksen-tiedot :? :1
+SELECT * FROM vastaajatunnus WHERE tunnus = :tunnus;
+
 -- :name vastaajatunnus-olemassa? :? :1
 SELECT TRUE AS olemassa FROM vastaajatunnus WHERE tunnus = :vastaajatunnus;
 
@@ -90,6 +93,16 @@ SELECT vt.vastaajatunnusid, vt.tunnus, vt.voimassa_loppupvm,
 EXISTS(SELECT 1 FROM vastaaja v WHERE v.vastaajatunnusid = vt.vastaajatunnusid) AS vastattu
 FROM vastaajatunnus vt
 WHERE vt.tunnus = :tunnus;
+
+-- :name nippu-status :? :1
+SELECT n.tunniste, n.voimassa_loppupvm,
+EXISTS (
+    SELECT 1 FROM vastaajatunnus vt
+    JOIN vastaaja v ON v.vastaajatunnusid = vt.vastaajatunnusid
+    AND vt.metatiedot->>'nippu' = n.tunniste)
+AS vastattu
+FROM nippu n
+WHERE n.tunniste = :tunniste;
 
 -- :name hae-kyselyn-kohteet :? :*
 SELECT vt.tunnus, kk.nimi, vt.voimassa_alkupvm,

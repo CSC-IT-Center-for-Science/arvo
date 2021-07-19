@@ -96,9 +96,9 @@
     :summary "Metatietojen päivitys"
     :description "Päivitä vastaajatunnuksen valitut metatiedot. Ei voi käyttää metatietokentän poistamiseen."
     (let [paivitettavat-metatiedot (select-keys metatiedot sallitut-metatiedot)
-          rivia-paivitetty (vt/paivita-metatiedot tunnus metatiedot)]
-      (if (not= rivia-paivitetty 0)
-        (api-response paivitettavat-metatiedot)
+          paivitetyt-metatiedot (vt/paivita-metatiedot tunnus paivitettavat-metatiedot)]
+      (if (not= (:riveja paivitetyt-metatiedot) 0)
+        (api-response (dissoc paivitetyt-metatiedot :riveja))
         (response/not-found "Ei vastaajatunnusta integraatiokäyttäjälle"))))
   (GET "/status/:tunnus" []
     :path-params [tunnus :- s/Str]
@@ -121,12 +121,18 @@
     :summary "Yksittäisen vastaajatunnuksen luominen"
     (let [luotu-tunnus (vt/lisaa-tyoelamapalaute-tunnus! data)]
       (vastaajatunnus-response luotu-tunnus (:request-id data))))
+  (GET "/status/:tunniste" []
+    :path-params [tunniste :- s/Str]
+    :return (s/maybe {:tunniste s/Str :voimassa_loppupvm org.joda.time.DateTime :vastattu s/Bool})
+    :summary "Kyselylinkin tila"
+    (let [status (db/nippu-status {:tunniste tunniste})]
+      (api-response status)))
   (DELETE "/vastaajatunnus/:tunnus" []
     :path-params [tunnus :- s/Str]
     :responses {status/ok {:schema s/Str :description "Tunnus poistettu"}
                 status/not-found {:schema s/Str :description "Tunnuksella on jo vastauksia"}}
     :summary "Poista vastaajatunnus"
-    (poista-vastaajatunnus tunnus))
+    (poista-vastaajatunnus tunnus))         
   (POST "/nippu" []
     :body [data Nippulinkki]
     :responses {status/ok {:schema {:nippulinkki s/Str :voimassa_loppupvm org.joda.time.DateTime}}
@@ -145,9 +151,9 @@
     :body [metatiedot {(s/optional-key :tila) s/Str}]
     :summary "Nipun metatietojen päivitys"
     (let [paivitettavat-metatiedot (select-keys metatiedot sallitut-metatiedot)
-          rivia-paivitetty (vt/paivita-nipun-metatiedot tunniste metatiedot)]
-      (if (not= rivia-paivitetty 0)
-        (api-response paivitettavat-metatiedot)
+          paivitetyt-metatiedot (vt/paivita-nipun-metatiedot tunniste paivitettavat-metatiedot)]
+      (if (not= (:riveja paivitetyt-metatiedot) 0)
+        (api-response (dissoc paivitetyt-metatiedot :riveja))
         (response/not-found "Ei nippua integraatiokäyttäjälle"))))
 
   (DELETE "/nippu/:tunniste" []
