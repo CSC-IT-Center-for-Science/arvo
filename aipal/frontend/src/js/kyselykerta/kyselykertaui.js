@@ -213,7 +213,6 @@ angular.module('kyselykerta.kyselykertaui', ['yhteiset.palvelut.i18n', 'ui.boots
 
         if(!kysely.kaytettavissa || kysely.automatisoitu) { setMuokkaustila(false); }
         haeTutkinnot(kysely)
-        $scope.vain_omat = kysely.tyyppi === 'amispalaute'
         if(!$scope.uusi){
           haeTunnukset();
           if(kysely.tyyppi === 'tyoelamapalaute'){
