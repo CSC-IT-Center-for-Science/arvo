@@ -1,0 +1,1 @@
+ALTER TABLE automaattikysely RENAME COLUMN kyselykerta_metatiedot TO kyselykerta_kategoria;
