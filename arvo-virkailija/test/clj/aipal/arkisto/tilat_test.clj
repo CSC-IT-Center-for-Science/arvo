@@ -1,11 +1,11 @@
-(ns aipal.arkisto.tilat-test
+(ns arvo.arkisto.tilat-test
   (:require [clojure.test :refer :all]
             [korma.core :as sql]
             [clj-time.core :as time]
-            [aipal.integraatio.sql.korma :as taulut]
-            [aipal.sql.test-util :refer :all]
-            [aipal.sql.test-data-util :refer :all]
-            [aipal.arkisto.vastaajatunnus :refer :all]))
+            [arvo.integraatio.sql.korma :as taulut]
+            [arvo.sql.test-util :refer :all]
+            [arvo.sql.test-data-util :refer :all]
+            [arvo.arkisto.vastaajatunnus :refer :all]))
 
 (use-fixtures :each tietokanta-fixture)
 
@@ -72,48 +72,6 @@
                                  (sql/select :kyselykerta
                                    (sql/fields :kyselykerta.kaytettavissa)
                                    (sql/where {:kyselykertaid (:kyselykertaid kyselykerta)})))))))))
-
-;(deftest ^:integraatio vastaajatunnus-ei-kaytettavissa-kun-kysely-suljettu-test
-;  (let [kysely (lisaa-kysely! {:tila "suljettu"})
-;        kyselykerta (lisaa-kyselykerta! {:lukittu false} kysely)
-;        vastaatunnus (lisaa-vastaajatunnus! {:lukittu false} kyselykerta)]
-;    (is (not (:kaytettavissa
-;               (first
-;                 (sql/select :vastaajatunnus
-;                   (sql/fields :vastaajatunnus.kaytettavissa)
-;                   (sql/where {:vastaajatunnusid (:vastaajatunnusid vastaatunnus)}))))))))
-
-;(deftest ^:integraatio vastaajatunnuksen-tilat-kun-kyselykerta-ei-ole-lukittu-test
-;  (let [kysely (lisaa-kysely! {:tila "julkaistu"})
-;        kyselykerta (lisaa-kyselykerta! {:lukittu false} kysely)
-;        vastaajatunnus (first (lisaa-vastaajatunnus! {:lukittu false} kyselykerta))
-;        lukittu-vastaajatunnus (first (lisaa-vastaajatunnus! {:lukittu true} kyselykerta))]
-;    (testing "lukittu vastaajatunnus ei ole käytettävissä"
-;      (is (not (:kaytettavissa (first
-;                         (sql/select :vastaajatunnus
-;                           (sql/fields :vastaajatunnus.kaytettavissa)
-;                           (sql/where {:vastaajatunnusid (:vastaajatunnusid lukittu-vastaajatunnus)})))))))
-;    (testing "lukitsematon vastaajatunnus on käytettävissä"
-;      (is (:kaytettavissa (first
-;                            (sql/select :vastaajatunnus
-;                              (sql/fields :vastaajatunnus.kaytettavissa)
-;                              (sql/where {:vastaajatunnusid (:vastaajatunnusid vastaajatunnus)}))))))))
-
-;(deftest ^:integraatio vastaajatunnuksen-tilat-kun-kyselykerta-on-lukittu-test
-;  (let [kysely (lisaa-kysely! {:tila "julkaistu"})
-;        kyselykerta (lisaa-kyselykerta! {:lukittu true} kysely)
-;        vastaajatunnus (first (lisaa-vastaajatunnus! {:lukittu false} kyselykerta))
-;        lukittu-vastaajatunnus (first (lisaa-vastaajatunnus! {:lukittu true} kyselykerta))]
-;    (testing "lukittu vastaajatunnus ei ole käytettävissä"
-;      (is (not (:kaytettavissa (first
-;                         (sql/select :vastaajatunnus
-;                           (sql/fields :vastaajatunnus.kaytettavissa)
-;                           (sql/where {:vastaajatunnusid (:vastaajatunnusid lukittu-vastaajatunnus)})))))))
-;    (testing "lukitsematon vastaajatunnus ei ole käytettävissä"
-;      (is (not (:kaytettavissa (first
-;                                (sql/select :vastaajatunnus
-;                                  (sql/fields :vastaajatunnus.kaytettavissa)
-;                                  (sql/where {:vastaajatunnusid (:vastaajatunnusid vastaajatunnus)})))))))))
 
 (deftest ^:integraatio julkaistun-kyselyn-voimassaolo-test
   (let [kysely (lisaa-kysely! {:tila "julkaistu"

@@ -1,7 +1,7 @@
-(ns aipal.rest-api.kysely-test
-  (:require [aipal.rest-api.kysely :refer [lisaa-kysymysryhma! paivita-kysely! lisakysymysten-lukumaara]]
-            [aipal.rest-api.rest-util :refer [rest-kutsu body-json]]
-            aipal.toimiala.kayttajaoikeudet)
+(ns arvo.rest-api.kysely-test
+  (:require [arvo.rest-api.kysely :refer [lisaa-kysymysryhma! paivita-kysely! lisakysymysten-lukumaara]]
+            [arvo.rest-api.rest-util :refer [rest-kutsu body-json]]
+            arvo.toimiala.kayttajaoikeudet)
   (:use clojure.test))
 
 (def kysely->kysymys (atom {}))
@@ -16,20 +16,20 @@
 (defn fake-kysely-fixture [f]
   (tyhjaa-fake-kanta!)
   (with-redefs [(swap! kysely->kysymys update-in [kyselyid] (fnil conj #{}) kysymysid)
-                aipal.arkisto.kysely/poista-kysymykset! (fn [kyselyid]
+                arvo.arkisto.kysely/poista-kysymykset! (fn [kyselyid]
                                                           (swap! kysely->kysymys dissoc kyselyid))
-                aipal.arkisto.kysely/lisaa-kysymysryhma! (fn [kyselyid kysymysryhma]
+                arvo.arkisto.kysely/lisaa-kysymysryhma! (fn [kyselyid kysymysryhma]
                                                            (swap! kysely->kysymysryhma update-in [kyselyid] (fnil conj #{}) (:kysymysryhmaid kysymysryhma)))
-                aipal.arkisto.kysely/poista-kysymysryhmat! (fn [kyselyid]
+                arvo.arkisto.kysely/poista-kysymysryhmat! (fn [kyselyid]
                                                              (swap! kysely->kysymysryhma dissoc kyselyid))
-                aipal.arkisto.kysely/hae-kysymysten-poistettavuus (fn [kysymysryhmaid] (@kysymysryhma->kysymys kysymysryhmaid))
-                aipal.arkisto.kysely/muokkaa-kyselya! identity
-                aipal.toimiala.kayttajaoikeudet/kysely-luonti? (constantly true)
-                aipal.toimiala.kayttajaoikeudet/kysymysryhma-luku? (constantly true)
-                aipal.toimiala.kayttajaoikeudet/kysymysryhma-on-julkaistu? (constantly true)
+                arvo.arkisto.kysely/hae-kysymysten-poistettavuus (fn [kysymysryhmaid] (@kysymysryhma->kysymys kysymysryhmaid))
+                arvo.arkisto.kysely/muokkaa-kyselya! identity
+                arvo.toimiala.kayttajaoikeudet/kysely-luonti? (constantly true)
+                arvo.toimiala.kayttajaoikeudet/kysymysryhma-luku? (constantly true)
+                arvo.toimiala.kayttajaoikeudet/kysymysryhma-on-julkaistu? (constantly true)
 
-                aipal.arkisto.kysely/lisaa! identity
-                aipal.arkisto.kysely/samanniminen-kysely? (constantly false)]
+                arvo.arkisto.kysely/lisaa! identity
+                arvo.arkisto.kysely/samanniminen-kysely? (constantly false)]
     (f)))
 
 (defn aseta-fake-kannan-kysymysryhma! [kysymysryhmaid kysymykset]

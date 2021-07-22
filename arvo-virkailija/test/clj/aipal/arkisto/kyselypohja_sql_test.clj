@@ -1,11 +1,11 @@
-(ns aipal.arkisto.kyselypohja-sql-test
+(ns arvo.arkisto.kyselypohja-sql-test
   (:require [clojure.test :refer :all]
             [korma.core :as sql]
             [clj-time.core :as time]
-            [aipal.sql.test-util :refer [tietokanta-fixture]]
-            [aipal.integraatio.sql.korma :refer [kyselypohja]]
-            [aipal.arkisto.kyselypohja :refer :all]
-            [aipal.sql.test-data-util :refer :all]))
+            [arvo.sql.test-util :refer [tietokanta-fixture]]
+            [arvo.integraatio.sql.korma :refer [kyselypohja]]
+            [arvo.arkisto.kyselypohja :refer :all]
+            [arvo.sql.test-data-util :refer :all]))
 
 (use-fixtures :each tietokanta-fixture)
 

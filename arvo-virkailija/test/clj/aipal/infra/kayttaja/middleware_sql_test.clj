@@ -1,15 +1,15 @@
-(ns aipal.infra.kayttaja.middleware-sql-test
+(ns arvo.infra.kayttaja.middleware-sql-test
   (:require [clojure.test :refer :all]
             [clojure.tools.logging :as log]
             [korma.core :as sql]
             [korma.db :as db]
-            [aipal.sql.test-util :refer [exec-raw-fixture]]
-            [aipal.integraatio.sql.korma :as taulut]
-            [aipal.infra.kayttaja.vaihto :refer [with-kayttaja]]
-            [aipal.infra.kayttaja.vakiot :refer [jarjestelma-uid]]
-            [aipal.infra.kayttaja.middleware :refer :all]))
+            [arvo.sql.test-util :refer [exec-raw-fixture]]
+            [arvo.integraatio.sql.korma :as taulut]
+            [arvo.infra.kayttaja.vaihto :refer [with-kayttaja]]
+            [arvo.infra.kayttaja.vakiot :refer [jarjestelma-uid]]
+            [arvo.infra.kayttaja.middleware :refer :all]))
 
-;; Testataan, että Postgren aipal.kayttaja-muuttujaan päätyy aina käyttäjän oma
+;; Testataan, että Postgren arvo.kayttaja-muuttujaan päätyy aina käyttäjän oma
 ;; UID, eikä esim. tietokantayhteyden edellisen käyttäjän UID.
 (deftest ^:integraatio postgrelle-paatyy-aina-kayttajan-oma-uid
   (let [kayttajat (for [i (range 50)]
@@ -37,7 +37,7 @@
                                                           ((wrap-kayttaja (fn [_]
                                                                             (:current_setting
                                                                               (first
-                                                                                (sql/exec-raw "select current_setting('aipal.kayttaja');"
+                                                                                (sql/exec-raw "select current_setting('arvo.kayttaja');"
                                                                                               :results)))))
                                                             {:username k})))))))))]
            (is (= saikeiden-kysely-kayttajat saikeiden-sql-kayttajat)))

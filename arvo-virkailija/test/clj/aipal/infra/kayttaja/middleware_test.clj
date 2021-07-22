@@ -1,14 +1,14 @@
-(ns aipal.infra.kayttaja.middleware-test
+(ns arvo.infra.kayttaja.middleware-test
   (:require [clojure.test :refer :all]
             [korma.core :as sql]
-            [aipal.sql.test-util :refer [tietokanta-fixture]]
-            [aipal.integraatio.sql.korma :as taulut]
-            [aipal.infra.kayttaja :refer [*kayttaja*]]
-            [aipal.infra.kayttaja.middleware :refer :all]
-            aipal.infra.kayttaja.vaihto))
+            [arvo.sql.test-util :refer [tietokanta-fixture]]
+            [arvo.integraatio.sql.korma :as taulut]
+            [arvo.infra.kayttaja :refer [*kayttaja*]]
+            [arvo.infra.kayttaja.middleware :refer :all]
+            arvo.infra.kayttaja.vaihto))
 
 (defn ldap-fixture [f]
-  (with-redefs [aipal.infra.kayttaja.vaihto/hae-kayttaja-kayttoikeuspalvelusta (constantly nil)]
+  (with-redefs [arvo.infra.kayttaja.vaihto/hae-kayttaja-kayttoikeuspalvelusta (constantly nil)]
     (f)))
 
 (use-fixtures :each (compose-fixtures tietokanta-fixture ldap-fixture))

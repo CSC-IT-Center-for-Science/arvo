@@ -1,11 +1,11 @@
-(ns aipal.arkisto.kysymysryhma-sql-test
+(ns arvo.arkisto.kysymysryhma-sql-test
   (:require [clojure.test :refer :all]
             [korma.core :as sql]
             [clj-time.core :as time]
-            [aipal.sql.test-util :refer [tietokanta-fixture]]
-            [aipal.integraatio.sql.korma :refer [kysymys kysymysryhma]]
-            [aipal.arkisto.kysymysryhma :refer :all]
-            [aipal.sql.test-data-util :as test-data]))
+            [arvo.sql.test-util :refer [tietokanta-fixture]]
+            [arvo.integraatio.sql.korma :refer [kysymys kysymysryhma]]
+            [arvo.arkisto.kysymysryhma :refer :all]
+            [arvo.sql.test-data-util :as test-data]))
 
 (use-fixtures :each tietokanta-fixture)
 

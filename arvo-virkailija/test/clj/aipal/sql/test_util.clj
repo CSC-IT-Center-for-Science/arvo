@@ -12,16 +12,15 @@
 ;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;; European Union Public Licence for more details.
 
-(ns aipal.sql.test-util
+(ns arvo.sql.test-util
   (:import java.util.Locale)
   (:require [korma.core :as sql]
             [korma.db :as db]
             [oph.common.infra.i18n :as i18n]
             [infra.test.data :as testdata]
-            [aipal.asetukset :refer [hae-asetukset oletusasetukset]]
-            [aipal.integraatio.sql.korma :refer [kayttaja]]
-            [aipal.toimiala.kayttajaoikeudet :as ko]
-            [aipal.infra.kayttaja.vaihto :refer [with-kayttaja]]
+            [arvo.asetukset :refer [hae-asetukset oletusasetukset]]
+            [arvo.integraatio.sql.korma :refer [kayttaja]]
+            [arvo.infra.kayttaja.vaihto :refer [with-kayttaja]]
             oph.korma.common))
 
 (def testikayttaja-uid "MAN-O-TEST")

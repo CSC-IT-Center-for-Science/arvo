@@ -2,10 +2,10 @@
   (:require [clojure.test :refer :all]
             [clj-time.core :as time]
             [peridot.core :as peridot]
-            [aipal.sql.test-util :refer :all]
-            [aipal.sql.test-data-util :refer :all]
-            [aipal.arkisto.vastaajatunnus :as vastaajatunnus-arkisto]
-            [aipal.rest-api.rest-util :refer [rest-kutsu body-json session]]))
+            [arvo.sql.test-util :refer :all]
+            [arvo.sql.test-data-util :refer :all]
+            [arvo.arkisto.vastaajatunnus :as vastaajatunnus-arkisto]
+            [arvo.rest-api.rest-util :refer [rest-kutsu body-json session]]))
 
 (use-fixtures :each tietokanta-fixture)
 

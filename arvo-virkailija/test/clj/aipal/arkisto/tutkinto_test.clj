@@ -1,7 +1,7 @@
-(ns aipal.arkisto.tutkinto-test
+(ns arvo.arkisto.tutkinto-test
   (:require
     [clojure.test :refer :all]
-    [aipal.arkisto.tutkinto :as arkisto]
+    [arvo.arkisto.tutkinto :as arkisto]
     [clj-time.core :as time]))
 
 (deftest tutkinnot-hierarkiaksi-test

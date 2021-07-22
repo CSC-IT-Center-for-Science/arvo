@@ -1,9 +1,9 @@
-(ns aipal.toimiala.raportti.vertailuraportti-perf
+(ns arvo.toimiala.raportti.vertailuraportti-perf
     (:require [clojure.test :refer :all]
               [clj-gatling.core :refer [run-simulation]]
               [cheshire.core :as json]
-              [aipal.sql.test-util :refer :all]
-              [aipal.toimiala.raportti.perftest-util :refer :all]))
+              [arvo.sql.test-util :refer :all]
+              [arvo.toimiala.raportti.perftest-util :refer :all]))
 
 (use-fixtures :each tietokanta-fixture)
 

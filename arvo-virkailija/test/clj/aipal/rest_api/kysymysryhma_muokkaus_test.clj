@@ -1,9 +1,9 @@
 (ns arvo.rest-api.kysymysryhma-muokkaus-test
   (:require [clojure.test :refer :all]
             [korma.core :as sql]
-            [aipal.arkisto.kysymysryhma :as arkisto]
+            [arvo.arkisto.kysymysryhma :as arkisto]
             [arvo.rest-api.kysymysryhma :refer [paivita-kysymysryhma!]]
-            [aipal.sql.test-data-util :as test-data]))
+            [arvo.sql.test-data-util :as test-data]))
 
 (defn arkisto-stub-fixture [f]
   (with-redefs [arkisto/hae (fn [kysymysryhmaid] {})

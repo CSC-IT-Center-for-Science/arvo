@@ -1,10 +1,10 @@
-(ns aipal.arkisto.kyselykerta-sql-test
+(ns arvo.arkisto.kyselykerta-sql-test
   (:require [clojure.test :refer :all]
             [korma.core :as sql]
-            [aipal.arkisto.kyselykerta :refer :all]
-            [aipal.integraatio.sql.korma :as taulut]
-            [aipal.sql.test-data-util :as test-data]
-            [aipal.sql.test-util :refer [tietokanta-fixture] :as test-util]
+            [arvo.arkisto.kyselykerta :refer :all]
+            [arvo.integraatio.sql.korma :as taulut]
+            [arvo.sql.test-data-util :as test-data]
+            [arvo.sql.test-util :refer [tietokanta-fixture] :as test-util]
             [oph.common.util.util :refer [some-value
                                           some-value-with]]))
 

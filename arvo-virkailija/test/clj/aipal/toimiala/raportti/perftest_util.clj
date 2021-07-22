@@ -1,4 +1,4 @@
-(ns aipal.toimiala.raportti.perftest-util
+(ns arvo.toimiala.raportti.perftest-util
   (:require
     [org.httpkit.client :as http]
     [cheshire.core :refer :all]))

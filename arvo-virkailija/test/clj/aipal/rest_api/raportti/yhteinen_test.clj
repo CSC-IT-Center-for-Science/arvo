@@ -12,8 +12,8 @@
 ;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;; European Union Public Licence for more details.
 
-(ns aipal.rest-api.raportti.yhteinen-test
-  (:require [aipal.rest-api.raportti.yhteinen :refer :all])
+(ns arvo.rest-api.raportti.yhteinen-test
+  (:require [arvo.rest-api.raportti.yhteinen :refer :all])
   (:use clojure.test))
 
 (def ^:private handler identity)

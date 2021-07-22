@@ -12,16 +12,16 @@
 ;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;; European Union Public Licence for more details.
 
-(ns aipal.sql.test-data-util
-  (:require [aipal.arkisto.vastaajatunnus]
-    [aipal.arkisto.kysely]
-    [aipal.arkisto.kyselykerta]
-    [aipal.arkisto.koulutustoimija]
-    [aipal.arkisto.vastaajatunnus]
+(ns arvo.sql.test-data-util
+  (:require [arvo.arkisto.vastaajatunnus]
+    [arvo.arkisto.kysely]
+    [arvo.arkisto.kyselykerta]
+    [arvo.arkisto.koulutustoimija]
+    [arvo.arkisto.vastaajatunnus]
     [clj-time.core :as ctime]
     [korma.core :as sql]
     [oph.korma.common :refer [joda-datetime->sql-timestamp]]
-    [aipal.integraatio.sql.korma :as taulut]))
+    [arvo.integraatio.sql.korma :as taulut]))
 
 (def default-koulutusala
   {:koulutusalatunnus "1"
@@ -104,9 +104,9 @@
 (defn anna-koulutustoimija!
   "Palauttaa koulutustoimijan kannasta tai lisää uuden"
   []
-  (let [k (aipal.arkisto.koulutustoimija/hae-kaikki)]
+  (let [k (arvo.arkisto.koulutustoimija/hae-kaikki)]
     (or (first k)
-      (aipal.arkisto.koulutustoimija/lisaa! default-koulutustoimija))))
+      (arvo.arkisto.koulutustoimija/lisaa! default-koulutustoimija))))
 
 ;oppilaitos needs a valid koulutustoimija
 (defn lisaa-oppilaitos!
@@ -122,9 +122,9 @@
 (defn anna-avop-koulutustoimija!
   "Palauttaa oletus koulutustoimijan kannasta"
   []
-  (let [k (aipal.arkisto.koulutustoimija/hae (:ytunnus default-koulutustoimija))]
+  (let [k (arvo.arkisto.koulutustoimija/hae (:ytunnus default-koulutustoimija))]
    (or k
-     (aipal.arkisto.koulutustoimija/lisaa! default-koulutustoimija))))
+     (arvo.arkisto.koulutustoimija/lisaa! default-koulutustoimija))))
 
 (def kysely-num (atom 12))
 
@@ -135,7 +135,7 @@
    (let [koulutustoimija (anna-koulutustoimija!)]
      (lisaa-kysely! kysely koulutustoimija)))
   ([kysely koulutustoimija]
-   (aipal.arkisto.kysely/lisaa! (merge {:nimi_fi (str "oletuskysely, testi " (swap! kysely-num inc))
+   (arvo.arkisto.kysely/lisaa! (merge {:nimi_fi (str "oletuskysely, testi " (swap! kysely-num inc))
                                         :koulutustoimija (:ytunnus koulutustoimija)
                                         :tila "julkaistu"}
                                        kysely))))
@@ -148,14 +148,14 @@
    (let [koulutustoimija (anna-avop-koulutustoimija!)]
      (lisaa-avop-kysely! kysely koulutustoimija)))
   ([kysely koulutustoimija]
-   (aipal.arkisto.kysely/lisaa! (merge {:nimi_fi (str "avop oletuskysely, testi " (swap! kysely-num inc))
+   (arvo.arkisto.kysely/lisaa! (merge {:nimi_fi (str "avop oletuskysely, testi " (swap! kysely-num inc))
                                         :koulutustoimija (:ytunnus koulutustoimija)
                                         :tila "julkaistu"}
                                        kysely))))
 
 (defn lisaa-kysymysryhma-kyselyyn!
   [kysymysryhma {:keys [kyselyid]}]
-  (aipal.arkisto.kysely/lisaa-kysymysryhma! kyselyid kysymysryhma))
+  (arvo.arkisto.kysely/lisaa-kysymysryhma! kyselyid kysymysryhma))
 
 (defn lisaa-kyselykerta!
   ([]
@@ -163,7 +163,7 @@
   ([kyselykerta]
    (lisaa-kyselykerta! kyselykerta (lisaa-kysely!)))
   ([kyselykerta kysely]
-   (aipal.arkisto.kyselykerta/lisaa! (:kyselyid kysely) (merge {:nimi "oletuskyselykerta, testi"
+   (arvo.arkisto.kyselykerta/lisaa! (:kyselyid kysely) (merge {:nimi "oletuskyselykerta, testi"
                                                                 :voimassa_alkupvm (joda-datetime->sql-timestamp (ctime/now))
                                                                 :voimassa_loppupvm (joda-datetime->sql-timestamp (ctime/now))}
                                                                kyselykerta))))
@@ -177,7 +177,7 @@
    (lisaa-oppilaitos!)
    (lisaa-avop-kyselykerta! {} (lisaa-avop-kysely!)))
   ([kyselykerta kysely]
-   (aipal.arkisto.kyselykerta/lisaa! (:kyselyid kysely) (merge {:lukittu false
+   (arvo.arkisto.kyselykerta/lisaa! (:kyselyid kysely) (merge {:lukittu false
                                                                 :nimi "avop oletuskyselykerta, testi"
                                                                 :voimassa_alkupvm (joda-datetime->sql-timestamp (ctime/now))
                                                                 :voimassa_loppupvm (joda-datetime->sql-timestamp (ctime/now))}
@@ -196,7 +196,7 @@
   ([vastaajatunnus]
    (lisaa-vastaajatunnus! vastaajatunnus (lisaa-kyselykerta!)))
   ([vastaajatunnus kyselykerta]
-   (aipal.arkisto.vastaajatunnus/lisaa! (merge {:kyselykertaid (:kyselykertaid kyselykerta)
+   (arvo.arkisto.vastaajatunnus/lisaa! (merge {:kyselykertaid (:kyselykertaid kyselykerta)
                                                 :kohteiden_lkm 1}
                                                vastaajatunnus))))
 

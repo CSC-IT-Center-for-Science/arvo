@@ -1,15 +1,15 @@
-(ns aipal.rest-api.rest-util
+(ns arvo.rest-api.rest-util
   (:require [peridot.core :as peridot]
             [clj-time.core :as time]
             [cheshire.core :as cheshire]
             [oph.common.infra.i18n :as i18n]
             [oph.common.infra.common-audit-log-test :as common-audit-log-test]
             [arvo.palvelin :as palvelin]
-            [aipal.integraatio.sql.korma :as korma]
-            [aipal.infra.kayttaja.vaihto :refer [with-kayttaja]]
-            [aipal.infra.kayttaja.vakiot :refer [default-test-user-uid]]
-            [aipal.sql.test-util :refer :all]
-            [aipal.sql.test-data-util :refer :all]
+            [arvo.integraatio.sql.korma :as korma]
+            [arvo.infra.kayttaja.vaihto :refer [with-kayttaja]]
+            [arvo.infra.kayttaja.vakiot :refer [default-test-user-uid]]
+            [arvo.sql.test-util :refer :all]
+            [arvo.sql.test-data-util :refer :all]
             [buddy.sign.jws :as jws]
             [arvo.config :refer [env]]))
 

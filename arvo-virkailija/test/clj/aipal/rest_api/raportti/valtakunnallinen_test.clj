@@ -1,10 +1,10 @@
-(ns aipal.rest-api.raportti.valtakunnallinen-test
+(ns arvo.rest-api.raportti.valtakunnallinen-test
   (:require [clojure.test :refer :all]
     [peridot.core :as peridot]
-    [aipal.sql.test-util :refer :all]
-    [aipal.sql.test-data-util :refer :all]
-    [aipal.rest-api.rest-util :refer [rest-kutsu body-json session]]
-    [aipal.rest-api.raportti.valtakunnallinen :refer :all :as valtakunnallinen]))
+    [arvo.sql.test-util :refer :all]
+    [arvo.sql.test-data-util :refer :all]
+    [arvo.rest-api.rest-util :refer [rest-kutsu body-json session]]
+    [arvo.rest-api.raportti.valtakunnallinen :refer :all :as valtakunnallinen]))
 
 (use-fixtures :each tietokanta-fixture)
 
@@ -56,22 +56,6 @@
        ; (spit "filetto" (with-out-str (clojure.pprint/pprint vastaus)))
         (is (= (poista-luontipvm-kentat oikea-raportti) (poista-luontipvm-kentat vastaus)))))))
 
-
-;(deftest ^:integraatio muodosta-vertailuraportti
-;  (testing "vertailuraportin perustapaus"
-;    (tarkista-valtakunnallinen-raportti perustapaus-json "test-resources/vertailuraportin-perustapaus.edn")))
-
-;(deftest ^:integraatio muodosta-kehitysraportti
-;  (testing "Kehitysraportin perustapaus"
-;    (tarkista-valtakunnallinen-raportti kehitysraportti-json "test-resources/kehitysraportin-perustapaus.edn")))
-
-;(deftest ^:integraatio muodosta-kehitysraportti-ei-vastaajia
-;  (testing "Kehitysraportti, tutkintorajauksella ei löydy tarpeeksi vastaajia"
-;    (tarkista-valtakunnallinen-raportti kehitysraportti-ei-vastaajia-json "test-resources/kehitysraportti-eivastaajia.edn")))
-
-;(deftest ^:integraatio muodosta-ketjutettu-kehitysraportti
-;  (testing "Kehitysraportin ketjuttaminen"
-;    (tarkista-valtakunnallinen-raportti kehitysraportti-ketjutettu-json "test-resources/kehitysraportti-ketjutettu.edn")))
 
 (deftest ^:integraatio muodosta-tutkintovertailun-parametrit-test
   (are [opintoalat koulutusalat odotettu-tulos]

@@ -1,10 +1,10 @@
-(ns aipal.infra.kayttaja.vaihto-test
+(ns arvo.infra.kayttaja.vaihto-test
   (:require [clojure.test :refer :all]
-            [aipal.infra.kayttaja :refer [*kayttaja*]]
-            [aipal.infra.kayttaja.vaihto :refer :all]
-            [aipal.infra.kayttaja.sql :refer [with-sql-kayttaja*]]
-            [aipal.arkisto.kayttaja :as kayttaja-arkisto]
-            [aipal.arkisto.kayttajaoikeus :as kayttajaoikeus-arkisto]))
+            [arvo.infra.kayttaja :refer [*kayttaja*]]
+            [arvo.infra.kayttaja.vaihto :refer :all]
+            [arvo.infra.kayttaja.sql :refer [with-sql-kayttaja*]]
+            [arvo.arkisto.kayttaja :as kayttaja-arkisto]
+            [arvo.arkisto.kayttajaoikeus :as kayttajaoikeus-arkisto]))
 
 (defn stub-fixture [f]
   (with-redefs [kayttaja-arkisto/hae (constantly {})
