@@ -2,12 +2,13 @@
   (:require [schema.core :as s]))
 
 (s/defschema Vastaajatunnus-metatiedot
-  {(s/optional-key :tila) (s/enum "success" "failure" "bounced")})
+  {(s/optional-key :tila) s/Str})
 
 (def Kieli (s/constrained String #(= 2 (count %))))
 
 (s/defschema Amispalaute-tunnus
   {:vastaamisajan_alkupvm                           s/Str ;ISO formaatti
+   (s/optional-key :vastaamisajan_loppupvm)         s/Str
    :kyselyn_tyyppi                                  s/Str  ;kyselykerran metatieto tarkenne
    :tutkintotunnus                                  s/Str ;6 merkkiä
    :tutkinnon_suorituskieli                         Kieli
@@ -16,8 +17,9 @@
    (s/optional-key :oppilaitos_oid)                 (s/maybe s/Str) ;organisaatio-oid
    (s/optional-key :toimipiste_oid)                 (s/maybe s/Str) ;organisaatio-oid
    (s/optional-key :hankintakoulutuksen_toteuttaja) (s/maybe s/Str)
+   (s/optional-key :heratepvm)                      (s/maybe s/Str)
    :request_id                                      s/Str
-   (s/optional-key :metatiedot)                     Vastaajatunnus-metatiedot})
+   (s/optional-key :metatiedot)                     {(s/optional-key :tila) s/Str}})
 
 (s/defschema Tyoelamapalaute-tunnus
   {:koulutustoimija_oid                        s/Str

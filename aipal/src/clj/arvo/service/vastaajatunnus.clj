@@ -61,12 +61,13 @@
 
 (defn amispalaute-tunnus [data]
   (let [koulutustoimija (:ytunnus (db/hae-oidilla {:taulu "koulutustoimija" :oid (:koulutustoimija_oid data)}))
-        kyselykertaid (:kyselykertaid (kyselykerta/hae-automaatti-kyselykerta koulutustoimija "amispalaute" (:kyselyn_tyyppi data)))
-        alkupvm (:vastaamisajan_alkupvm data)]
+        kyselykertaid (:kyselykertaid (kyselykerta/hae-automaatti-kyselykerta koulutustoimija "amispalaute" (:kyselyn_tyyppi data)))]
     (automaatti-vastaajatunnus :amispalaute
                                {:kyselykertaid kyselykertaid
-                                :voimassa_alkupvm alkupvm
+                                :voimassa_alkupvm (:vastaamisajan_alkupvm data)
+                                :voimassa_loppupvm (:vastaamisajan_loppupvm data)
                                 :koulutustoimija koulutustoimija
+                                :heratepvm (:heratepvm data)
                                 :kieli (:tutkinnon_suorituskieli data)
                                 :toimipiste (:toimipistekoodi (db/hae-oidilla {:taulu "toimipiste" :oid (:toimipiste_oid data)}))
                                 :valmistavan_koulutuksen_oppilaitos (:oppilaitoskoodi (db/hae-oidilla {:taulu "oppilaitos" :oid (:oppilaitos_oid data)}))
@@ -159,11 +160,22 @@
       (vastaajatunnus/poista-nippu tunniste)
       {:error "Nipussa on jo vastauksia"})))
 
-(defn paivita-metatiedot [tunnus paivitettavat-metatiedot]
-  (let [paivitettava-vastaajatunnus {:metatiedot paivitettavat-metatiedot
+(defn paivita-tila [metatiedot vanhat-metatiedot]
+  (if (= (:tila vanhat-metatiedot) "lahetetty")
+    (assoc metatiedot :tila "lahetetty")
+    metatiedot))
+
+(defn paivita-metatiedot [tunnus metatiedot]
+  (let [vanhat-metatiedot (:metatiedot (db/hae-vastaajatunnuksen-tiedot {:tunnus tunnus}))
+        paivitettavat-metatiedot (paivita-tila metatiedot vanhat-metatiedot)
+        paivitettava-vastaajatunnus {:metatiedot paivitettavat-metatiedot
                                      :tunnus tunnus
-                                     :kayttaja aipal.infra.kayttaja.vakiot/integraatio-uid}]
-    (db/paivita-metatiedot! paivitettava-vastaajatunnus)))
+                                     :kayttaja aipal.infra.kayttaja.vakiot/integraatio-uid}
+        riveja-paivitetty (db/paivita-metatiedot! paivitettava-vastaajatunnus)]
+    (assoc paivitettavat-metatiedot :riveja riveja-paivitetty)))
 
 (defn paivita-nipun-metatiedot [tunniste metatiedot]
-  (db/paivita-nipun-metatiedot! {:tunniste tunniste :metatiedot metatiedot}))
+  (let [vanhat-metatiedot (:metatiedot (db/hae-nippu {:tunniste tunniste}))
+        paivitettavat-metatiedot (paivita-tila metatiedot vanhat-metatiedot)
+        riveja-paivitetty (db/paivita-nipun-metatiedot! {:tunniste tunniste :metatiedot paivitettavat-metatiedot})]
+    (assoc paivitettavat-metatiedot :riveja riveja-paivitetty)))
