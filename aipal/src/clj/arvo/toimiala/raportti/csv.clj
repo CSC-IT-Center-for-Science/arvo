@@ -6,6 +6,7 @@
             [aipal.toimiala.raportti.util :refer [muuta-kaikki-stringeiksi]]
             [arvo.db.core :as db]
             [aipal.arkisto.kysely :refer [aseta-jatkokysymysten-jarjestys hae-kyselyn-kysymykset]]
+            [aipal.arkisto.tutkinto :as tutkinto]
             [clj-time.core :as time]
             [clj-time.format :as f]
             [arvo.config :refer [env]]
@@ -25,6 +26,7 @@
                                 :tutkintotunnus "Tutkinto"
                                 :vastausten_lkm "Vastaajien lkm" :vastaajien_lkm "Vastaajien lkm" :kohteiden_lkm "Kohteiden lkm"
                                 :tutkinto_selite "Tutkinnon nimi"
+                                :tutkinnon_osa_selite "Tutkinnon osan nimi"
                                 :hankintakoulutuksen_toteuttaja_selite "Hankintakoulutuksen toteuttajan nimi"
                                 :toimipiste_selite "Toimipisteen nimi"
                                 :koulutustoimija_selite "Koulutustoimijan nimi"
@@ -34,7 +36,11 @@
                                 :oppilaitos_nimi "Oppilaitos"
                                 :koulutusmuoto "Koulutusmuoto"
                                 :nimi "Kyselykerta"
-                                :tila "Sähköpostin lähetyksen tila"}
+                                :nippu "Nippulinkki"
+                                :tila "Sähköpostin lähetyksen tila"
+                                :odottaa_niputusta "Odottaa niputusta"
+                                :niputettu "Niputettu"
+                                :ei_niputeta "Ei niputeta"}
                            :sv {:vastaajatunnus "Svarskod"
                                 :vastausaika "Svarstid"
                                 :tunnus "Svarskod"
@@ -45,6 +51,7 @@
                                 :tutkintotunnus "Tutkinto"
                                 :vastausten_lkm "Respondents antal" :vastaajien_lkm "Respondents antal" :kohteiden_lkm "Svarsantal"
                                 :tutkinto_selite "Namn på examen"
+                                :tutkinnon_osa_selite "Namn på examensdel"
                                 :hankintakoulutuksen_toteuttaja_selite "Namn på anordnaren av anskaffad utbildning"
                                 :toimipiste_selite "Namn på verksamhetsställe"
                                 :koulutustoimija_selite "Namn på utbildningsaktör"
@@ -54,7 +61,11 @@
                                 :oppilaitos_nimi "Läroanstalt"
                                 :koulutusmuoto "Utbildningsform"
                                 :nimi "Frågeformulärsomgång"
-                                :tila "TODO"}
+                                :nippu "Nippulinkki"
+                                :tila "Status"
+                                :odottaa_niputusta "Väntar på buntning "
+                                :niputettu "Buntad"
+                                :ei_niputeta "Inte buntas"}
                            :en {:vastaajatunnus "Answer identifier" :vastausaika "Response time"
                                 :tunnus "Answer identifier"
                                 :luotuaika "TimeCreated"
@@ -64,6 +75,7 @@
                                 :tutkintotunnus "Tutkinto"
                                 :vastausten_lkm "RespondentCount" :vastaajien_lkm "RespondentCount" :kohteiden_lkm "ResponseCount"
                                 :tutkinto_selite "Name of degree"
+                                :tutkinnon_osa_selite "Name of the qualification unit"
                                 :hankintakoulutuksen_toteuttaja_selite "Name of provider (procured training)"
                                 :toimipiste_selite "Name of operational unit"
                                 :koulutustoimija_selite "Name of education provider"
@@ -73,7 +85,10 @@
                                 :oppilaitos_nimi "Educational institution"
                                 :koulutusmuoto "Form of education"
                                 :nimi " Questionnaire instance"
-                                :tila "TODO"}})
+                                :tila "Status"
+                                :odottaa_niputusta "Waiting for bundling"
+                                :niputettu "Bundled successfully"
+                                :ei_niputeta "Not bundled"}})
 
 (def delimiter \;)
 
@@ -130,7 +145,13 @@
          [false true] "eos"
          [false false] ""))
 
-(defn get-answer-text [choices type answers lang]
+(defn alasvetovalikko-vastaus [answers koodistot lang]
+  (let [answer (first answers)
+        koodisto (get-in koodistot [(:koodisto answer)])
+        koodi (first (filter #(= (:koodi_arvo %) (str (:numerovalinta answer))) koodisto))]
+    (translate-field "nimi" lang koodi)))
+
+(defn get-answer-text [choices type answers koodistot lang]
   (match [type]
          ["arvosana"] (:numerovalinta (first answers))
          ["arvosana4_ja_eos"] (numero-tai-eos (first answers))
@@ -147,13 +168,13 @@
                            (replace-control-chars (:vapaateksti (first answers))))
          ["kylla_ei_valinta"] (:vaihtoehto (first answers))
          ["luku"] (:numerovalinta (first answers))
-         ["alasvetovalikko"] (:numerovalinta (first answers))
+         ["alasvetovalikko"] (alasvetovalikko-vastaus answers koodistot lang)
          :else ""))
 
-(defn get-answer [answers choices lang [key value]]
+(defn get-answer [answers choices koodistot lang [key value]]
   (let [answers-for-question (filter #(if (= (get % key) value) %) answers)
         first-answer (first answers-for-question)]
-    [(get-answer-text choices (:vastaustyyppi first-answer) answers-for-question lang)]))
+    [(get-answer-text choices (:vastaustyyppi first-answer) answers-for-question koodistot lang)]))
 
 (defn get-value [tutkintotunnus-old entry]
   (let [entry-missing (nil? entry)
@@ -203,7 +224,10 @@
     [:vastaajatunnus :vastausaika :oppilaitos_nimi]
     [:vastaajatunnus :vastausaika]))
 
-(def default-vastaajatunnus-fields [:tunnus :url :luotuaika :voimassa_alkupvm :voimassa_loppupvm :vastausten_lkm :kohteiden_lkm])
+(defn default-vastaajatunnus-fields [kyselytyyppi]
+  (if (= kyselytyyppi "tyoelamapalaute")
+    [:tunnus :luotuaika :voimassa_alkupvm :voimassa_loppupvm :vastausten_lkm :kohteiden_lkm]
+    [:tunnus :url :luotuaika :voimassa_alkupvm :voimassa_loppupvm :vastausten_lkm :kohteiden_lkm]))
 
 (defn get-csv-field [kentta]
   (if (get-in kentta [:raportointi :csv :selitteet])
@@ -227,9 +251,9 @@
             value (translate-field "kentta" lang taustatieto)]
         {translate-key value}))))
 
-(defn hae-vastaus [kysymys vastaukset monivalintavaihtoehdot lang]
+(defn hae-vastaus [kysymys vastaukset monivalintavaihtoehdot koodistot lang]
   (let [kysymyksen-vastaukset (filter  #(= (:kysymysid kysymys) (:kysymysid %)) vastaukset)]
-    (get-answer-text monivalintavaihtoehdot (:vastaustyyppi kysymys) kysymyksen-vastaukset lang)))
+    (get-answer-text monivalintavaihtoehdot (:vastaustyyppi kysymys) kysymyksen-vastaukset koodistot lang)))
 
 (defn lisaa-selitteet [data selitteet lang]
   (-> data
@@ -253,7 +277,10 @@
                (first (filter #(= (:asuinkunta_koodi data) (:kuntakoodi %)) (:kunnat selitteet)))))
       (assoc :opiskelupaikkakunta_koodi_selite
              (translate-field "nimi" lang
-               (first (filter #(= (:opiskelupaikkakunta_koodi data) (:kuntakoodi %)) (:kunnat selitteet)))))))
+               (first (filter #(= (:opiskelupaikkakunta_koodi data) (:kuntakoodi %)) (:kunnat selitteet)))))
+      (assoc :tutkinnon_osa_selite
+             (translate-field "nimi" lang
+               (first (filter #(= (:tutkinnon_osa data) (:koodi_arvo %)) (:tutkinnonosat selitteet)))))))
 
 
 (defn format-vastaus [vastaus selitteet lang]
@@ -262,18 +289,18 @@
       (assoc :oppilaitos_nimi (translate-field "oppilaitos_nimi" lang vastaus))
       (lisaa-selitteet selitteet lang)))
 
-(defn luo-vastausrivi [template lang taustatieto-fields choices selitteet answers]
+(defn luo-vastausrivi [template lang taustatieto-fields choices selitteet koodistot answers]
   (let [formatted-answers (map #(format-vastaus % selitteet lang) answers)
         taustatiedot (select-values-or-nil (first formatted-answers) taustatieto-fields)]
-    (concat taustatiedot (mapcat #(get-answer formatted-answers choices lang %) template))))
+    (concat taustatiedot (mapcat #(get-answer formatted-answers choices koodistot lang %) template))))
 
-(defn luo-vastaajan-vastausrivit [[_ answers] kysymykset taustatieto-fields choices selitteet lang]
+(defn luo-vastaajan-vastausrivit [[_ answers] kysymykset taustatieto-fields choices selitteet koodistot lang]
   (let [formatted-answers (map #(format-vastaus % selitteet lang) answers)
         taustatiedot (select-values-or-nil (first formatted-answers) taustatieto-fields)]
     (->> kysymykset
          (map #(concat taustatiedot
                        [(translate-field "kysymysryhma" lang %) (translate-field "kysymys" lang %)
-                        (hae-vastaus % answers choices lang)])))))
+                        (hae-vastaus % answers choices koodistot lang)])))))
 
 (defn create-header-row [header kysymykset lang translations]
   (let [header-fields (map #(get translations %) header)
@@ -291,7 +318,19 @@
    :hankintakoulutuksen-toteuttajat (db/hae-kyselyn-hankintakoulutuksen-toteuttajat {:kyselyid kyselyid})
    :koulutustoimijat (db/hae-kyselyn-koulutustoimijat {:kyselyid kyselyid})
    :koulutusalat (db/hae-kyselyn-koulutusalat {:kyselyid kyselyid})
-   :kunnat (hae-kunnat (:koodistopalvelu env))})
+   :kunnat (hae-kunnat (:koodistopalvelu env))
+   :tutkinnonosat (tutkinto/hae-tutkinnon-osat)})
+
+(defn hae-koodisto [koodisto]
+  {koodisto (db/hae-koodiston-koodit {:koodistouri koodisto})})
+
+(defn hae-koodistot [kysymykset]
+  (->> kysymykset
+       (map #(get-in % [:kysymys_metatiedot :koodisto]))
+       (filter some?)
+       (into #{})
+       (map hae-koodisto)
+       (apply merge)))
 
 (defn luovutuslupa [[vastaajaid vastaukset] kysymysid]
   (= 0 (:numerovalinta (first (filter #(= kysymysid (:kysymysid %)) vastaukset)))))
@@ -311,6 +350,7 @@
         vastaukset (filter-not-allowed kyselytyyppi kysymykset
                                        (group-by :vastaajaid (db/hae-vastaukset {:kyselyid kyselyid})))
         monivalintavaihtoehdot (hae-monivalinnat kysymykset)
+        koodistot (hae-koodistot kysymykset)
         selitteet (hae-selitteet kyselyid)
         template (create-row-template kysymykset)
         header (create-header-row taustatieto-fields kysymykset lang translations)
@@ -318,6 +358,7 @@
                                             taustatieto-fields
                                             monivalintavaihtoehdot
                                             selitteet
+                                            koodistot
                                             (second %)) vastaukset)]
     (csv-response kyselyid lang (create-csv (cons header vastausrivit)))))
 
@@ -326,12 +367,13 @@
         taustatiedot (db/kyselyn-kentat {:kyselyid kyselyid})
         taustatieto-fields (get-csv-fields kyselytyyppi taustatiedot)
         kysymykset (hae-kysymykset kyselyid)
+        koodistot (hae-koodistot kysymykset)
         selitteet (hae-selitteet kyselyid)
         translations (luo-käännökset taustatiedot lang)
         vastaukset (filter-not-allowed kyselytyyppi kysymykset (group-by :vastaajaid (db/hae-vastaukset {:kyselyid kyselyid})))
         monivalintavaihtoehdot (hae-monivalinnat kysymykset)
         header (create-header-row-single taustatieto-fields translations)
-        vastausrivit (mapcat #(luo-vastaajan-vastausrivit % kysymykset taustatieto-fields monivalintavaihtoehdot selitteet lang) vastaukset)]
+        vastausrivit (mapcat #(luo-vastaajan-vastausrivit % kysymykset taustatieto-fields monivalintavaihtoehdot selitteet koodistot lang) vastaukset)]
     (csv-response kyselyid lang (create-csv (cons header vastausrivit)))))
 
 (defn vastaajatunnus-url [tunnus]
@@ -341,9 +383,19 @@
   (concat (map #(get translations %) taustatieto-fields)
           (map #(get translations %) [:kysymysryhma :kysymys :vastaus])))
 
-(defn format-tunnus [tunnus selitteet lang]
+(defn format-metatiedot [kyselytyyppi lang metatiedot]
+  (if (= kyselytyyppi "tyoelamapalaute")
+    (let [nippu (:nippu metatiedot)
+          tila (or (keyword (:tila metatiedot))
+                   (if (nil? nippu)
+                     :odottaa_niputusta
+                     :niputettu))]
+         (merge metatiedot
+                {:tila (get-in default-translations [lang tila])}))))
+
+(defn format-tunnus [tunnus kyselytyyppi selitteet lang]
   (-> (merge (:taustatiedot tunnus) tunnus)
-      (merge (:metatiedot tunnus))
+      (merge (format-metatiedot kyselytyyppi lang (:metatiedot tunnus)))
       (assoc :url (vastaajatunnus-url tunnus))
       (update :voimassa_alkupvm format-date)
       (update :voimassa_loppupvm format-date)
@@ -351,18 +403,19 @@
       (lisaa-selitteet selitteet lang)))
 
 (defn vastaajatunnuksen-metatieto-kentat [kyselytyyppi]
-  (if (some #(= kyselytyyppi %) ["amispalaute" "tyoelamapalaute"])
-    [:tila]
+  (case kyselytyyppi
+    "amispalaute" [:tila]
+    "tyoelamapalaute" [:tila :nippu]
     []))
 
 (defn vastaajatunnus-csv [kyselykertaid lang]
   (let [kyselyid (:kyselyid (db/hae-kyselykerta {:kyselykertaid kyselykertaid}))
         kyselytyyppi (:tyyppi (db/hae-kysely {:kyselyid kyselyid}))
         selitteet (hae-selitteet kyselyid)
-        tunnukset (map #(format-tunnus % selitteet lang) (db/hae-vastaajatunnus {:kyselykertaid kyselykertaid}))
+        tunnukset (map #(format-tunnus % kyselytyyppi selitteet lang) (db/hae-vastaajatunnus {:kyselykertaid kyselykertaid}))
         taustatiedot (db/kyselyn-kentat {:kyselyid kyselyid})
         translations (luo-käännökset taustatiedot lang)
-        vastaajatunnus-kentat (concat default-vastaajatunnus-fields
+        vastaajatunnus-kentat (concat (default-vastaajatunnus-fields kyselytyyppi)
                                       (taustatieto-kentat taustatiedot)
                                       (vastaajatunnuksen-metatieto-kentat kyselytyyppi))
         header (map #(get translations %) vastaajatunnus-kentat)

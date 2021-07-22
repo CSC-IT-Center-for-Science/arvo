@@ -19,23 +19,9 @@
             [oph.common.util.util :refer [pisteavaimet->puu
                                           deep-merge
                                           deep-update-vals
-                                          paths]]
-            [schema.coerce :as sc])
+                                          paths]])
   (:import [ch.qos.logback.classic.joran JoranConfigurator]
            [org.slf4j LoggerFactory]))
-
-(defn string->boolean [x]
-  (case x
-    "true" true
-    "false" false
-    x))
-
-(defn string-coercion-matcher [schema]
-  (or (sc/string-coercion-matcher schema)
-      ({Boolean string->boolean} schema)))
-
-(defn coerce-asetukset [asetukset tyypit]
-  ((sc/coercer tyypit string-coercion-matcher) asetukset))
 
 (defn konfiguroi-lokitus
   "Konfiguroidaan logback asetukset tiedostosta."
@@ -59,18 +45,3 @@
     (catch java.io.FileNotFoundException _
       (log/info "Asetustiedostoa ei löydy. Käytetään oletusasetuksia")
       {})))
-
-(defn tulkitse-asetukset
-  [property-map]
-  (->> property-map
-     (into {})
-     pisteavaimet->puu))
-
-(defn lue-asetukset
-  [oletukset tyypit asetustiedosto-polku]
-  (let [asetus-map (tulkitse-asetukset (lue-asetukset-tiedostosta asetustiedosto-polku))
-        korjattu-map (deep-merge oletukset asetus-map)
-        asetukset (coerce-asetukset korjattu-map tyypit)]
-    (if (instance? schema.utils.ErrorContainer asetukset)
-      (throw (ex-info "Virheellinen asetustiedosto" (:error asetukset)))
-      asetukset)))

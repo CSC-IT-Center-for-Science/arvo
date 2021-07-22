@@ -1,4 +1,4 @@
-# Add custom env variables to dev.env file in this folder. Format: DB__MIGRATION_USER=username = {:db {:migration-user username}}
+# Add custom env variables to arvo.env file in this folder. Format: DB__MIGRATION_USER=username = {:db {:migration-user username}}
 
 version: "3.9"
 services:
@@ -9,7 +9,7 @@ services:
     ports:
       - "8082:8082"
     env_file:
-      - dev.env
+      - arvo.env
     volumes:
       - type: bind
         target: /opt/arvo/logs
