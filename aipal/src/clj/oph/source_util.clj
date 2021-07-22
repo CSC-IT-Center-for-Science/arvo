@@ -110,20 +110,6 @@
     (let [fn-name (name (nth muoto 1))]
       (.endsWith fn-name "!"))))
 
-(defn audit-log-kutsu-puuttuu?
-  "tarkistaa puuttuuko audit-log kutsu muodosta jossa sellainen pitäisi olla"
-  [muoto]
-  (let [sisaltaa-audit-kutsun? (some #(and (symbol? %)
-                                        (= "auditlog" (.getNamespace %)))
-                                 (flatten muoto))]
-    (when (and
-            (ei-audit-logitettava-funktio? muoto)
-            (sivuvaikutuksellinen-funktio? muoto)
-            (public-function? muoto)
-            (not sisaltaa-audit-kutsun?))
-      (println "! AUDITLOG kutsu puuttuu: " (nth muoto 1))
-      (str (nth muoto 1)))))
-
 (defn js-console-log-calls []
   (vastaavat-rivit "resources/public/js"
                                #".*\.js"

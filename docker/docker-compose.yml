@@ -1,0 +1,16 @@
+# Add custom env variables to arvo.env file in this folder. Format: DB__MIGRATION_USER=username = {:db {:migration-user username}}
+
+version: "3.9"
+services:
+  arvo:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    ports:
+      - "8082:8082"
+    env_file:
+      - arvo.env
+    volumes:
+      - type: bind
+        target: /opt/arvo/logs
+        source: ../logs

@@ -9,7 +9,7 @@
             [aipal.arkisto.tutkinto :as tutkinto]
             [clj-time.core :as time]
             [clj-time.format :as f]
-            [aipal.asetukset :refer [asetukset]]
+            [arvo.config :refer [env]]
             [arvo.util :refer [in?]]
             [aipal.integraatio.koodistopalvelu :refer [hae-kunnat]]))
 
@@ -319,7 +319,7 @@
    :hankintakoulutuksen-toteuttajat (db/hae-kyselyn-hankintakoulutuksen-toteuttajat {:kyselyid kyselyid})
    :koulutustoimijat (db/hae-kyselyn-koulutustoimijat {:kyselyid kyselyid})
    :koulutusalat (db/hae-kyselyn-koulutusalat {:kyselyid kyselyid})
-   :kunnat (hae-kunnat (:koodistopalvelu @asetukset))
+   :kunnat (hae-kunnat (:koodistopalvelu env))
    :tutkinnonosat (tutkinto/hae-tutkinnon-osat)})
 
 (defn hae-koodisto [koodisto]
@@ -378,7 +378,7 @@
     (csv-response kyselyid lang (create-csv (cons header vastausrivit)))))
 
 (defn vastaajatunnus-url [tunnus]
-  (str (:vastaus-base-url @asetukset) "/v/" (:tunnus tunnus)))
+  (str (:vastaus-base-url env) "/v/" (:tunnus tunnus)))
 
 (defn create-header-row-single [taustatieto-fields translations]
   (concat (map #(get translations %) taustatieto-fields)

@@ -19,7 +19,6 @@
             [clojure.tools.logging :as log]
             [clj-time.core :as time]
             [arvo.db.core :refer [*db*] :as db]
-            [aipal.auditlog :as auditlog]
             [clojure.java.jdbc :as jdbc]
             [arvo.util :refer [add-index]]
             [oph.common.util.util :refer [map-by]])
@@ -148,20 +147,17 @@
 
 
 (defn julkaise-kysely! [kyselyid]
-  (auditlog/kysely-muokkaus! kyselyid :julkaistu)
   (db/muuta-kyselyn-tila! {:kyselyid kyselyid :tila "julkaistu" :kayttaja (:oid *kayttaja*)})
   ;; haetaan kysely, jotta saadaan myös kaytettavissa tieto mukaan paluuarvona
   (-> (hae kyselyid)
       (assoc :sijainti "julkaistu")))
 
 (defn palauta-luonnokseksi! [kyselyid]
-  (auditlog/kysely-muokkaus! kyselyid :luonnos)
   (db/muuta-kyselyn-tila! {:kyselyid kyselyid :tila "luonnos" :kayttaja (:oid *kayttaja*)})
   (-> (hae kyselyid)
       (assoc :sijainti "luonnos")))
 
 (defn sulje-kysely! [kyselyid]
-  (auditlog/kysely-muokkaus! kyselyid :suljettu)
   (db/muuta-kyselyn-tila! {:kyselyid kyselyid :tila "suljettu" :kayttaja (:oid *kayttaja*)})
   (-> (hae kyselyid)
       (assoc :sijainti "suljettu")))
@@ -182,11 +178,9 @@
     :lkm))
 
 (defn poista-kysymykset! [kyselyid]
-  (auditlog/kysely-muokkaus! kyselyid)
   (db/poista-kyselyn-kysymykset! {:kyselyid kyselyid}))
 
 (defn poista-kysymysryhmat! [kyselyid]
-  (auditlog/kysely-muokkaus! kyselyid)
   (db/poista-kyselyn-kysymysryhmat! {:kyselyid kyselyid}))
 
 (defn hae-kyselyn-taustakysymysryhmaid [kyselyid]

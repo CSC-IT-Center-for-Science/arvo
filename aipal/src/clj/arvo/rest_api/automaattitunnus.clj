@@ -7,9 +7,9 @@
             [clojure.tools.logging :as log]
             [arvo.db.core :refer [*db*] :as db]
             [arvo.util :refer [api-response]]
-            [aipal.asetukset :refer [asetukset]]
             [clj-time.format :as f]
             [schema.core :as s]
+            [arvo.config :refer [env]]
             [arvo.service.vastaajatunnus :as vt]))
 
 (defn handle-error
@@ -23,7 +23,7 @@
 
 (defn vastauslinkki-response [luotu-tunnus request-id]
   (if (:tunnus luotu-tunnus)
-    (api-response {:kysely_linkki (str (:vastaus-base-url @asetukset)"/v/"(:tunnus luotu-tunnus))
+    (api-response {:kysely_linkki (str (:vastaus-base-url env)"/v/"(:tunnus luotu-tunnus))
                    :voimassa_loppupvm (f/unparse (f/formatters :date)(:voimassa_loppupvm luotu-tunnus))
                    :tunnus (:tunnus luotu-tunnus)})
     (handle-error (:error luotu-tunnus) request-id)))
@@ -37,7 +37,7 @@
     (handle-error (:error luotu-tunnus) request-id)))
 
 (defn nippulinkki-response [massatunnus]
-  (api-response {:nippulinkki (str (:vastaus-base-url @asetukset)"/n/"(:tunniste massatunnus))
+  (api-response {:nippulinkki (str (:vastaus-base-url env)"/n/"(:tunniste massatunnus))
                  :voimassa_loppupvm (f/unparse (f/formatters :date) (:voimassa_loppupvm massatunnus))}))
 
 (defn kyselyynohjaus-response [luotu-tunnus]

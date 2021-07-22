@@ -8,7 +8,6 @@
             [stencil.core :as s]
 
             [oph.common.infra.csrf-token :refer [aseta-csrf-token wrap-tarkasta-csrf-token]]
-            [aipal.asetukset :refer [service-path build-id project-version]]
             [aipal.basic-auth :refer [wrap-basic-authentication]]
             aipal.rest-api.i18n
             aipal.rest-api.kysely
@@ -37,7 +36,9 @@
             arvo.rest-api.admin
             [compojure.api.middleware :as mw]
             [arvo.auth.api :refer [wrap-authentication]]
-            [aipal.infra.kayttaja :refer [*kayttaja*]]))
+            [aipal.infra.kayttaja :refer [*kayttaja*]]
+            [arvo.util :refer [service-path]]
+            [arvo.config :refer [project-version]]))
 
 (defn reitit [asetukset]
   (api
@@ -59,7 +60,6 @@
                                                (merge {:base-url (-> asetukset :server :base-url)
                                                        :vastaus-base-url (-> asetukset :vastaus-base-url)
                                                        :current-user (:nimi *kayttaja*)
-                                                       :build-id @build-id
                                                        :project-version @project-version
                                                        :development-mode (pr-str (:development-mode asetukset))
                                                        :ominaisuus (cheshire/generate-string (:ominaisuus asetukset))}
