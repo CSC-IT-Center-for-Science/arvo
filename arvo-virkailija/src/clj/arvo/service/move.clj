@@ -1,7 +1,7 @@
 (ns arvo.service.move
   (:require [selmer.parser :as selmer]
             [arvo.service.email :as email]
-            [aipal.arkisto.vastaajatunnus :refer [get-vastaajatunnukset]]
+            [arvo.arkisto.vastaajatunnus :refer [get-vastaajatunnukset]]
             [clojure.java.jdbc :as jdbc]
             [arvo.db.core :refer [*db*] :as db]))
 

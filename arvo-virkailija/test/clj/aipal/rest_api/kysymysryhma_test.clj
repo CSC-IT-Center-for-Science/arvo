@@ -1,5 +1,5 @@
-(ns aipal.rest-api.kysymysryhma_test
-  (:require [aipal.rest-api.kysymysryhma :as api]
+(ns arvo.rest-api.kysymysryhma_test
+  (:require [arvo.rest-api.kysymysryhma :as api]
             [arvo.util :refer [add-index]])
   (:use clojure.test))
 

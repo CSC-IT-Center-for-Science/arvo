@@ -1,6 +1,6 @@
-(ns aipal.basic-auth-test
+(ns arvo.basic-auth-test
   (:require [clojure.test :refer :all]
-            [aipal.basic-auth :refer :all]))
+            [arvo.basic-auth :refer :all]))
 
 (deftest hae-tunnus-test
   (testing "hae-tunnus"

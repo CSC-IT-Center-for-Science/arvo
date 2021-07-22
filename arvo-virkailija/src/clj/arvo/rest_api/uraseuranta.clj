@@ -4,7 +4,7 @@
             [ring.util.http-response :as response]
             [buddy.auth.backends.token :refer (jws-backend)]
             [schema.core :as s]
-            [aipal.arkisto.vastaajatunnus :as vastaajatunnus]
+            [arvo.arkisto.vastaajatunnus :as vastaajatunnus]
             [buddy.auth :refer [authenticated? throw-unauthorized]]
             [arvo.db.core :refer [*db*] :as db]
             [oph.common.util.http-util :refer [response-or-404]]

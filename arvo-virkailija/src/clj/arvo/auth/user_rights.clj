@@ -1,5 +1,5 @@
 (ns arvo.auth.user-rights
-  (:require [aipal.infra.kayttaja :as kayttaja :refer [*kayttaja*]]
+  (:require [arvo.infra.kayttaja :as kayttaja :refer [*kayttaja*]]
             [clojure.core.match :refer [match]]
             [arvo.db.core :refer [*db*] :as db]
             [clojure.tools.logging :as log]))

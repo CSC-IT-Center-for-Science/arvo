@@ -1,8 +1,8 @@
-(ns aipal.rest-api.kysymysryhma-lisaa-kysymys-test
+(ns arvo.rest-api.kysymysryhma-lisaa-kysymys-test
   (:require [clojure.test :refer :all]
             [korma.core :as sql]
             [aipal.arkisto.kysymysryhma :as arkisto]
-            [aipal.rest-api.kysymysryhma :refer [lisaa-kysymys!]]))
+            [arvo.rest-api.kysymysryhma :refer [lisaa-kysymys!]]))
 
 (defn arkisto-stub-fixture [f]
   (with-redefs [arkisto/hae (fn [kysymysryhmaid] {})

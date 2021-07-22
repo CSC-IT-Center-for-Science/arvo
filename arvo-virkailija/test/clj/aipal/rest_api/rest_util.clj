@@ -4,7 +4,7 @@
             [cheshire.core :as cheshire]
             [oph.common.infra.i18n :as i18n]
             [oph.common.infra.common-audit-log-test :as common-audit-log-test]
-            [aipal.palvelin :as palvelin]
+            [arvo.palvelin :as palvelin]
             [aipal.integraatio.sql.korma :as korma]
             [aipal.infra.kayttaja.vaihto :refer [with-kayttaja]]
             [aipal.infra.kayttaja.vakiot :refer [default-test-user-uid]]

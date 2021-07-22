@@ -3,15 +3,15 @@
             [oph.common.util.http-util :refer [parse-iso-date]]
             [oph.common.util.util :refer [map-by]]
             [clojure.core.match :refer [match]]
-            [aipal.toimiala.raportti.util :refer [muuta-kaikki-stringeiksi]]
+            [arvo.toimiala.raportti.util :refer [muuta-kaikki-stringeiksi]]
             [arvo.db.core :as db]
-            [aipal.arkisto.kysely :refer [aseta-jatkokysymysten-jarjestys hae-kyselyn-kysymykset]]
-            [aipal.arkisto.tutkinto :as tutkinto]
+            [arvo.arkisto.kysely :refer [aseta-jatkokysymysten-jarjestys hae-kyselyn-kysymykset]]
+            [arvo.arkisto.tutkinto :as tutkinto]
             [clj-time.core :as time]
             [clj-time.format :as f]
             [arvo.config :refer [env]]
             [arvo.util :refer [in?]]
-            [aipal.integraatio.koodistopalvelu :refer [hae-kunnat]]))
+            [arvo.integraatio.koodistopalvelu :refer [hae-kunnat]]))
 
 (def default-translations {:fi {:vastaajatunnus "Vastaajatunnus"
                                 :vastausaika "Vastausaika"

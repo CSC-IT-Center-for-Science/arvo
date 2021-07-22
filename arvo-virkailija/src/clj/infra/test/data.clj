@@ -16,9 +16,9 @@
   (:require [korma.core :as sql]
             [korma.db :as db]
             [oph.korma.common :refer [select-unique-or-nil]]
-            [aipal.integraatio.sql.korma :as taulut]
-            [aipal.infra.kayttaja.vaihto :refer [with-kayttaja]]
-            [aipal.infra.kayttaja.vakiot :refer [jarjestelma-uid]]))
+            [arvo.integraatio.sql.korma :as taulut]
+            [arvo.infra.kayttaja.vaihto :refer [with-kayttaja]]
+            [arvo.infra.kayttaja.vakiot :refer [jarjestelma-uid]]))
 
 (def taulut
   "Taulut vierasavainriippuvuuksien mukaisessa järjestyksessä, ensin taulu josta viitataan myöhemmin nimettyyn."

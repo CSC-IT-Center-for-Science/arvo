@@ -1,7 +1,7 @@
 (ns arvo.service.osio-tunnukset
   (:require [arvo.db.core :refer [*db*] :as db]
             [clojure.java.jdbc :as jdbc]
-            [aipal.arkisto.vastaajatunnus :refer [get-vastaajatunnukset]]
+            [arvo.arkisto.vastaajatunnus :refer [get-vastaajatunnukset]]
             [clojure.tools.logging :as log]))
 
 

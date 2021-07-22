@@ -1,8 +1,8 @@
-(ns aipal.rest-api.kysymysryhma-muokkaus-test
+(ns arvo.rest-api.kysymysryhma-muokkaus-test
   (:require [clojure.test :refer :all]
             [korma.core :as sql]
             [aipal.arkisto.kysymysryhma :as arkisto]
-            [aipal.rest-api.kysymysryhma :refer [paivita-kysymysryhma!]]
+            [arvo.rest-api.kysymysryhma :refer [paivita-kysymysryhma!]]
             [aipal.sql.test-data-util :as test-data]))
 
 (defn arkisto-stub-fixture [f]

@@ -12,9 +12,9 @@
 ;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;; European Union Public Licence for more details.
 
-(ns aipal.toimiala.raportti.yhdistaminen_test
+(ns arvo.toimiala.raportti.yhdistaminen_test
   (:require [clojure.test :refer [are deftest is testing]]
-            [aipal.toimiala.raportti.yhdistaminen :refer :all]))
+            [arvo.toimiala.raportti.yhdistaminen :refer :all]))
 
 (deftest yhdistä-kentästä-test
   (is (= (yhdistä-kentästä :kenttä [{:kenttä "1"}

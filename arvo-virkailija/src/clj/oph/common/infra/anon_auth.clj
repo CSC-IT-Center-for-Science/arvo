@@ -30,10 +30,3 @@
   (let [old-config (oph.cas.util.DevelopmentSSLAuthUtil/enableUntrustedSSL)]
     (log/info "SSL ok")))
 
-; TODO: defmacro tms. joka on tämän tyylinen olisi parempi tapa hoitaa asia..
-; with-unsafe-ssl
-;   (let [old-config (oph.cas.util.DevelopmentSSLAuthUtil/enableUntrustedSSLForLocalhostOnly)]
-;     body
-;     (oph.cas.util.DevelopmentSSLAuthUtil/swapSSLConfig old-config)
-;
-

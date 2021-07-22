@@ -1,4 +1,4 @@
-(ns aipal.rest-api.vastaajatunnus-test
+(ns arvo.rest-api.vastaajatunnus-test
   (:require [clojure.test :refer :all]
             [clj-time.core :as time]
             [peridot.core :as peridot]

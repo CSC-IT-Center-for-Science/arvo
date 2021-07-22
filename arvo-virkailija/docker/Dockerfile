@@ -26,7 +26,7 @@ FROM azul/zulu-openjdk-alpine:8-jre AS runtime
 WORKDIR /arvo
 
 COPY docker/logback.xml resources/
-COPY --from=clojurebuild /arvo-build/target/aipal-standalone.jar ./arvo.jar
+COPY --from=clojurebuild /arvo-build/target/arvo.jar ./arvo.jar
 # For openshift environments
 RUN chmod 0755 resources/logback.xml arvo.jar
 

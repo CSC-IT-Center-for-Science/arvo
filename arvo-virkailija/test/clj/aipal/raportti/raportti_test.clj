@@ -2,8 +2,8 @@
   (:require [clojure.test :refer :all]
     [aipal.sql.test-util :refer :all]
     [aipal.sql.test-data-util :refer :all]
-    [aipal.toimiala.raportti.kysely :as kysely-raportti]
-    [aipal.toimiala.raportti.valtakunnallinen :as valtakunnallinen-raportti]))
+    [arvo.toimiala.raportti.kysely :as kysely-raportti]
+    [arvo.toimiala.raportti.valtakunnallinen :as valtakunnallinen-raportti]))
 
 (use-fixtures :each tietokanta-fixture)
 

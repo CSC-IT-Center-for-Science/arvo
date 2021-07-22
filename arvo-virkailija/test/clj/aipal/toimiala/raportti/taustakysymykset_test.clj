@@ -12,9 +12,9 @@
 ;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;; European Union Public Licence for more details.
 
-(ns aipal.toimiala.raportti.taustakysymykset-test
+(ns arvo.toimiala.raportti.taustakysymykset-test
   (:require [clojure.test :refer [are deftest is testing]]
-            [aipal.toimiala.raportti.taustakysymykset :refer :all]))
+            [arvo.toimiala.raportti.taustakysymykset :refer :all]))
 
 (deftest mappaa-kysymysid-test
   (testing "Jos annetaan molemmista taustakysymyksistä löytyvä id, palauttaa molemmat vastaavat "
@@ -52,7 +52,7 @@
       (is (= (yhdista-valtakunnalliset-taustakysymysryhmat kysymysryhmat) kysymysryhmat)))))
 
 (deftest poista-kysymys-kysymysryhmasta-test
-  (let [poista-kysymys-kysymysryhmasta #'aipal.toimiala.raportti.taustakysymykset/poista-kysymys-kysymysryhmasta]
+  (let [poista-kysymys-kysymysryhmasta #'arvo.toimiala.raportti.taustakysymykset/poista-kysymys-kysymysryhmasta]
     (is (= (poista-kysymys-kysymysryhmasta {:kysymykset [{:kysymysid 123}]} 123)
            {:kysymykset []}))
     (is (= (poista-kysymys-kysymysryhmasta {:kysymykset [{:kysymysid 123}]} 456)
@@ -61,8 +61,8 @@
            {:kysymykset [{:kysymysid 123}]}))))
 
 (deftest poista-taustakysymys-raportista-test
-  (let [poista-taustakysymys-raportista #'aipal.toimiala.raportti.taustakysymykset/poista-taustakysymys-raportista]
-    (with-redefs [aipal.toimiala.raportti.taustakysymykset/poista-kysymys-kysymysryhmasta
+  (let [poista-taustakysymys-raportista #'arvo.toimiala.raportti.taustakysymykset/poista-taustakysymys-raportista]
+    (with-redefs [arvo.toimiala.raportti.taustakysymykset/poista-kysymys-kysymysryhmasta
                   (fn [kysymysryhma kysymys]
                     (assoc kysymysryhma :poistettu-kysymys kysymys))]
       (is (= (poista-taustakysymys-raportista {:raportti [{:kysymysryhmaid suorittamisvaihe-id}]} 123)
@@ -71,7 +71,7 @@
              {:raportti [{:kysymysryhmaid 123456}]})))))
 
 (deftest hae-raportista-taustakysymys-6-test
-  (let [hae-raportista-taustakysymys-6 #'aipal.toimiala.raportti.taustakysymykset/hae-raportista-taustakysymys-6]
+  (let [hae-raportista-taustakysymys-6 #'arvo.toimiala.raportti.taustakysymykset/hae-raportista-taustakysymys-6]
     (is (= (hae-raportista-taustakysymys-6 {:raportti [{:kysymykset [{:kysymysid taustakysymys-6a-id}]}]})
            taustakysymys-6a-id))
     (is (= (hae-raportista-taustakysymys-6 {:raportti [{:kysymykset [{:kysymysid taustakysymys-6b-id}]}]})

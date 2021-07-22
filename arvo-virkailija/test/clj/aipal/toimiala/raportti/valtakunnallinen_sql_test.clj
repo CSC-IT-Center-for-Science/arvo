@@ -12,14 +12,14 @@
 ;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;; European Union Public Licence for more details.
 
-(ns aipal.toimiala.raportti.valtakunnallinen-sql-test
+(ns arvo.toimiala.raportti.valtakunnallinen-sql-test
   (:require [clojure.test :refer [are deftest is testing use-fixtures]]
             [korma.core :as sql]
             [clj-time.coerce :as time-coerce]
             [clj-time.core :as time]
             [clj-time.format :as time-format]
             [aipal.sql.test-util :refer :all]
-            [aipal.toimiala.raportti.valtakunnallinen :refer :all]))
+            [arvo.toimiala.raportti.valtakunnallinen :refer :all]))
 
 (use-fixtures :each tietokanta-fixture)
 

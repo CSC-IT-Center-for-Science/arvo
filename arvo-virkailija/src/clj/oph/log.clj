@@ -16,7 +16,7 @@
   (:require [clojure.tools.logging :as log]
             [robert.hooke :refer [add-hook]]
             [oph.common.infra.print-wrapper :as print-wrapper]
-            [aipal.infra.kayttaja :refer [*kayttaja*]]))
+            [arvo.infra.kayttaja :refer [*kayttaja*]]))
 
 (def ^:dynamic *lisaa-uid-ja-request-id?* true)
 

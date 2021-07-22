@@ -16,7 +16,7 @@
   (:require [clojure.repl :refer :all]
             [clojure.pprint :refer [pprint]]
             [clojure.java.shell :refer [with-sh-dir sh]]
-            [aipal.palvelin :refer [kaynnista!]]
+            [arvo.palvelin :refer [kaynnista!]]
             [clojure.tools.namespace.repl :as nsr]
             clojure.core.cache
             schema.core
@@ -52,7 +52,7 @@
 (defn stop []
   {:pre [@palvelin]
    :post [(not @palvelin)]}
-  ((ns-resolve 'aipal.palvelin 'sammuta) @palvelin)
+  ((ns-resolve 'arvo.palvelin 'sammuta) @palvelin)
   (reset! palvelin nil))
 
 (defn uudelleenkaynnista! []

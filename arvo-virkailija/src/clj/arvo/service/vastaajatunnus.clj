@@ -1,11 +1,11 @@
 (ns arvo.service.vastaajatunnus
   (:require [arvo.db.core :refer [*db*] :as db]
             [clojure.tools.logging :as log]
-            [aipal.arkisto.vastaajatunnus :as vastaajatunnus]
+            [arvo.arkisto.vastaajatunnus :as vastaajatunnus]
             [clj-time.core :as time]
-            [aipal.arkisto.oppilaitos :as oppilaitos]
-            [aipal.arkisto.tutkinto :as tutkinto]
-            [aipal.arkisto.kyselykerta :as kyselykerta]
+            [arvo.arkisto.oppilaitos :as oppilaitos]
+            [arvo.arkisto.tutkinto :as tutkinto]
+            [arvo.arkisto.kyselykerta :as kyselykerta]
             [clj-time.format :as f]))
 
 (def palaute-voimassaolo (time/months 6))
@@ -170,7 +170,7 @@
         paivitettavat-metatiedot (paivita-tila metatiedot vanhat-metatiedot)
         paivitettava-vastaajatunnus {:metatiedot paivitettavat-metatiedot
                                      :tunnus tunnus
-                                     :kayttaja aipal.infra.kayttaja.vakiot/integraatio-uid}
+                                     :kayttaja arvo.infra.kayttaja.vakiot/integraatio-uid}
         riveja-paivitetty (db/paivita-metatiedot! paivitettava-vastaajatunnus)]
     (assoc paivitettavat-metatiedot :riveja riveja-paivitetty)))
 
