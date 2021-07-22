@@ -7,12 +7,7 @@
   (:import (java.util Properties)))
 
 (def project-version
-  (delay
-    (-> (doto (Properties.)
-          (.load (-> "META-INF/maven/aipal/aipal/pom.properties"
-                     (io/resource)
-                     (io/reader))))
-        (.get "version"))))
+  (delay (-> "project.clj" slurp read-string (nth 2))))
 
 (defstate env
           :start

@@ -1,4 +1,4 @@
-(defproject aipal "2020.2.0"
+(defproject arvo-virkailija "2020.2.0"
   :description "Arvo"
   :dependencies [[org.clojure/data.zip "0.1.1"]
                  [ch.qos.logback/logback-classic "1.1.5"]
@@ -67,7 +67,7 @@
   :test-selectors {:default  (complement (some-fn :integraatio :performance))
                    :integraatio (complement (some-fn :performance))
                    :performance :performance}
-  :jar-name "aipal.jar"
+  :jar-name "arvo-min.jar"
   :uberjar-name "arvo.jar"
   :main arvo.palvelin
   :repl-options {:init-ns user})
