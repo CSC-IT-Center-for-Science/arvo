@@ -10,5 +10,5 @@ ansible/aipal_vagrant/salasanat/
 hs_err_pid*.log
 replay_pid*.log
 
-docker/dev.env
+docker/arvo.env
 logs/
